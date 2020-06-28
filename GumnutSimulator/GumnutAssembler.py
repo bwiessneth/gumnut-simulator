@@ -1,15 +1,15 @@
-__author__ = 'BW'
+__author__ = "BW"
 
 from collections import OrderedDict
 from .GumnutExceptions import *
 import re
 
 import logging
-logger = logging.getLogger('root')
+
+logger = logging.getLogger("root")
 
 
 class GumnutAssembler:
-
     def __init__(self):
         # RAW asm source code as a list of strings
         self.ASMSourceList = list()
@@ -47,40 +47,41 @@ class GumnutAssembler:
 
         #
         self.instruction_set_requirements = [
-            GasmInstruction(instruction='text'),
-            GasmInstruction(instruction='data'),
-            GasmInstruction(instruction='org'),
-            GasmInstruction(instruction='byte'),
-            GasmInstruction(instruction='bss'),
-            GasmInstruction(instruction='equ'),
-            GasmInstruction(instruction='add'),
-            GasmInstruction(instruction='addc'),
-            GasmInstruction(instruction='sub'),
-            GasmInstruction(instruction='subc'),
-            GasmInstruction(instruction='and'),
-            GasmInstruction(instruction='or'),
-            GasmInstruction(instruction='xor'),
-            GasmInstruction(instruction='mask'),
-            GasmInstruction(instruction='shl'),
-            GasmInstruction(instruction='shr'),
-            GasmInstruction(instruction='rol'),
-            GasmInstruction(instruction='ror'),
-            GasmInstruction(instruction='ldm'),
-            GasmInstruction(instruction='stm'),
-            GasmInstruction(instruction='inp'),
-            GasmInstruction(instruction='out'),
-            GasmInstruction(instruction='bz'),
-            GasmInstruction(instruction='bnz'),
-            GasmInstruction(instruction='bc'),
-            GasmInstruction(instruction='bnc'),
-            GasmInstruction(instruction='jmp'),
-            GasmInstruction(instruction='jsb'),
-            GasmInstruction(instruction='ret'),
-            GasmInstruction(instruction='reti'),
-            GasmInstruction(instruction='enai'),
-            GasmInstruction(instruction='disi'),
-            GasmInstruction(instruction='wait'),
-            GasmInstruction(instruction='stby')]
+            GasmInstruction(instruction="text"),
+            GasmInstruction(instruction="data"),
+            GasmInstruction(instruction="org"),
+            GasmInstruction(instruction="byte"),
+            GasmInstruction(instruction="bss"),
+            GasmInstruction(instruction="equ"),
+            GasmInstruction(instruction="add"),
+            GasmInstruction(instruction="addc"),
+            GasmInstruction(instruction="sub"),
+            GasmInstruction(instruction="subc"),
+            GasmInstruction(instruction="and"),
+            GasmInstruction(instruction="or"),
+            GasmInstruction(instruction="xor"),
+            GasmInstruction(instruction="mask"),
+            GasmInstruction(instruction="shl"),
+            GasmInstruction(instruction="shr"),
+            GasmInstruction(instruction="rol"),
+            GasmInstruction(instruction="ror"),
+            GasmInstruction(instruction="ldm"),
+            GasmInstruction(instruction="stm"),
+            GasmInstruction(instruction="inp"),
+            GasmInstruction(instruction="out"),
+            GasmInstruction(instruction="bz"),
+            GasmInstruction(instruction="bnz"),
+            GasmInstruction(instruction="bc"),
+            GasmInstruction(instruction="bnc"),
+            GasmInstruction(instruction="jmp"),
+            GasmInstruction(instruction="jsb"),
+            GasmInstruction(instruction="ret"),
+            GasmInstruction(instruction="reti"),
+            GasmInstruction(instruction="enai"),
+            GasmInstruction(instruction="disi"),
+            GasmInstruction(instruction="wait"),
+            GasmInstruction(instruction="stby"),
+        ]
 
     def load_asm_source_from_file(self, filename):
         """
@@ -91,7 +92,7 @@ class GumnutAssembler:
         with open(filename) as f:
             file_content = f.read()
 
-        self.ASMSourceList = file_content.split('\n')
+        self.ASMSourceList = file_content.split("\n")
         self.ASMLineCount = len(self.ASMSourceList)
 
     def load_asm_source(self, source):
@@ -101,14 +102,14 @@ class GumnutAssembler:
 
         :param source: Source code as a string
         """
-        self.ASMSourceList = source.split('\n')
+        self.ASMSourceList = source.split("\n")
         self.ASMLineCount = len(self.ASMSourceList)
 
     def assemble(self):
         self._parse_asm_source()
-        logger.debug('FIRST PASS')
+        logger.debug("FIRST PASS")
         self._iterate()
-        logger.debug('SECOND PASS')
+        logger.debug("SECOND PASS")
         self._iterate()
 
     def _check_number(self, operand):
@@ -125,34 +126,34 @@ class GumnutAssembler:
         :todo: Refactor two's complement conversion
         """
         # Check if operand isn't of type None and isn't a register
-        if operand and not operand[0] == 'r':
+        if operand and not operand[0] == "r":
             # Check for floating point numbers
-            if operand.find('.') != -1 or operand.find(',') != -1:
+            if operand.find(".") != -1 or operand.find(",") != -1:
                 return -1
 
             negative = False
             result = 0
 
-        # Strip sign from operand
+            # Strip sign from operand
             if operand[0] == "+":
-                operand = operand.replace('+', '')
+                operand = operand.replace("+", "")
             elif operand[0] == "-":
-                operand = operand.replace('-', '')
+                operand = operand.replace("-", "")
                 negative = True
 
-        # Check for HEX prefix
+            # Check for HEX prefix
             if operand[0:2] == "0x":
                 # Convert number to DEC
-                result = int(operand[2:len(operand)], 16)
+                result = int(operand[2 : len(operand)], 16)
                 if negative:
                     result = (~(result) & 0xFF) + 1
                     return result
                 else:
                     return result
-        # Check for BIN prefix
+            # Check for BIN prefix
             elif operand[0:2] == "0b":
                 # Convert number to DEC
-                result = int(operand[2:len(operand)], 2)
+                result = int(operand[2 : len(operand)], 2)
                 return result
             elif operand.isdigit():
                 # Operand is already a number
@@ -170,7 +171,7 @@ class GumnutAssembler:
         Format the parsed inputs by removing any whitespace
         """
         if operand:
-            operand = operand.replace(' ', '')
+            operand = operand.replace(" ", "")
             return operand
         else:
             return None
@@ -188,7 +189,9 @@ class GumnutAssembler:
         :todo: Add support for ascii chars e.g.:  char_a: equ 'a'
         """
         # Generate regex pattern
-        pattern = re.compile("^\s*(?:([A-Za-z]\w*)[:])?(?:\s*([A-Za-z]{2,4})(?:\s+([A-Za-z0-9+-]\w*)(?:\s)*(?:[,])*(?:\s)*(?:[\(])*(?:\s*)([A-Za-z0-9]\w*)?(?:\s)*(?:[\)])*(?:\s*[,]*\s*([A-Za-z0-9\+\-\ \_]*))?)?)?")
+        pattern = re.compile(
+            "^\s*(?:([A-Za-z]\w*)[:])?(?:\s*([A-Za-z]{2,4})(?:\s+([A-Za-z0-9+-]\w*)(?:\s)*(?:[,])*(?:\s)*(?:[\(])*(?:\s*)([A-Za-z0-9]\w*)?(?:\s)*(?:[\)])*(?:\s*[,]*\s*([A-Za-z0-9\+\-\ \_]*))?)?)?"
+        )
 
         # Match regex pattern against current line
         match = pattern.match(asm_source)
@@ -204,17 +207,19 @@ class GumnutAssembler:
 
             # Take data from each group and build a GasmLine
             # Check and convert numbers for rd, rs and rs2
-            parsed_asm_line = GasmLine(label=result[1],
-                                       instruction=result[2],
-                                       rd=self._check_number(result[3]),
-                                       op1=self._check_number(result[4]),
-                                       op2=self._check_number(result[5]))
+            parsed_asm_line = GasmLine(
+                label=result[1],
+                instruction=result[2],
+                rd=self._check_number(result[3]),
+                op1=self._check_number(result[4]),
+                op2=self._check_number(result[5]),
+            )
 
             self._validate_asm_line(parsed_asm_line)
             return parsed_asm_line
         else:
             # TODO: Catch source errors?
-            logger.critical('No match found')
+            logger.critical("No match found")
             return False
 
     def _parse_asm_source(self):
@@ -227,21 +232,20 @@ class GumnutAssembler:
         # Loop through each line of raw assembler source
         for asm_source_line in self.ASMSourceList:
             parsed_asm_line = self._extract_identifier_from_line(asm_source_line)
-            if (parsed_asm_line):
+            if parsed_asm_line:
                 # Append this GasmLine to our list of parsed GasmLines
                 self.ParsedASMList.append(parsed_asm_line)
 
                 # Populate source code column in source_objectcode_map
-                self.source_objectcode_map.update({self.ParsedASMLineCount:
-                                                   [asm_source_line,
-                                                    parsed_asm_line,
-                                                    None, None]})
+                self.source_objectcode_map.update(
+                    {self.ParsedASMLineCount: [asm_source_line, parsed_asm_line, None, None]}
+                )
 
                 self.ParsedASMLineCount += 1
             else:
-                logger.error('No match found')
+                logger.error("No match found")
 
-        logger.info('Parsed %d lines of code', self.ParsedASMLineCount)
+        logger.info("Parsed %d lines of code", self.ParsedASMLineCount)
 
     def _check_if_immed_instr(self, operand):
         """
@@ -258,7 +262,7 @@ class GumnutAssembler:
             return False
         elif type(operand) == int:
             return True
-        elif operand[0] == 'r' and operand[1].isdigit():
+        elif operand[0] == "r" and operand[1].isdigit():
             return False
         elif self._get_reference_or_value(operand):
             return True
@@ -279,7 +283,7 @@ class GumnutAssembler:
             # Check if operand has the format "r1"
             if operand[0] == "r" and operand[1].isdigit():
                 # Return number without "r"
-                return int(operand[1:len(operand)])
+                return int(operand[1 : len(operand)])
             else:
                 # No valid register number
                 return -1
@@ -310,13 +314,13 @@ class GumnutAssembler:
             # Check if op is a digit
             if type(operand) == int or operand.isdigit():
                 return False
-        # Check if op is a HEX number
+            # Check if op is a HEX number
             elif operand[0:2] == "0x":
                 return False
-        # Check if op is a BIN number
+            # Check if op is a BIN number
             elif operand[0:2] == "0b":
                 return False
-        # Check if op is a register
+            # Check if op is a register
             elif operand[0] == "r" and operand[1].isdigit():
                 return False
             else:
@@ -338,8 +342,7 @@ class GumnutAssembler:
             return self.DataRefDict[reference]
         else:
             # reference isn't known yet
-            logger.debug('Unknown reference "%s". Need a second pass',
-                         reference)
+            logger.debug('Unknown reference "%s". Need a second pass', reference)
             self.NeedSecondRun = True
             return False
 
@@ -370,41 +373,38 @@ class GumnutAssembler:
 
         # Check for directives
         if instr == "byte":
-            logger.debug('Found data var "%s" (%s) = %s @ %d', label, instr, 
-                         rd, self.DataMemPointer)
+            logger.debug('Found data var "%s" (%s) = %s @ %d', label, instr, rd, self.DataMemPointer)
             self.DataRefDict[label] = self.DataMemPointer
             self.DataList[self.DataMemPointer] = rd
             self.DataMemPointer += 1
             return -1
         elif instr == "bss":
-            logger.debug('Found data var "%s" (%s) = %s @ %d', label, instr,
-                         rd, self.DataMemPointer)
+            logger.debug('Found data var "%s" (%s) = %s @ %d', label, instr, rd, self.DataMemPointer)
             self.DataRefDict[label] = self.DataMemPointer
             self.DataList[self.DataMemPointer] = 0
             self.DataMemPointer += 1
             return -1
         elif instr == "ascii":
-            logger.debug('Found data var "%s" (%s) = %s @ %d', label, instr,
-                         rd, self.DataMemPointer)
+            logger.debug('Found data var "%s" (%s) = %s @ %d', label, instr, rd, self.DataMemPointer)
             self.DataRefDict[label] = self.DataMemPointer
             self.DataList[self.DataMemPointer] = rd
             self.DataMemPointer += 1
             return -1
         elif instr == "equ":
-            logger.debug('%s instruction %s = %s', instr, label, rd)
+            logger.debug("%s instruction %s = %s", instr, label, rd)
             value = rd
             self.DataRefDict[label] = value
             return -1
         elif instr == "text":
-            logger.debug('%s directive found', instr)
+            logger.debug("%s directive found", instr)
             self.text_directive = True
             return -1
         elif instr == "data":
-            logger.debug('%s directive found', instr)
+            logger.debug("%s directive found", instr)
             self.text_directive = False
             return -1
         elif instr == "org":
-            logger.debug('%s instruction = %s', instr, rd)
+            logger.debug("%s instruction = %s", instr, rd)
             if self.text_directive:
                 self.InstrMemPointer = int(rd)
             else:
@@ -414,7 +414,7 @@ class GumnutAssembler:
         # Check if current line has a label
         if label:
             logger.debug('Found label "%s" @ %d', label, self.InstrMemPointer)
-        # Create dictionary item with label and instruction memory pointer
+            # Create dictionary item with label and instruction memory pointer
             self.ProgRefDict[label] = self.InstrMemPointer
 
         # Generate instruction memory from instruction, rd, op1, op2
@@ -422,168 +422,168 @@ class GumnutAssembler:
         if instr == "add":
             if self._check_if_immed_instr(rs2):
                 # Immediate access
-                logger.debug('%s immediate instruction', instr)
+                logger.debug("%s immediate instruction", instr)
                 BitField |= 0b0000 << 14
-                BitField |= self._get_register_number(rd) << 11     # Place rd
-                BitField |= self._get_register_number(rs) << 8      # Place rs
+                BitField |= self._get_register_number(rd) << 11  # Place rd
+                BitField |= self._get_register_number(rs) << 8  # Place rs
                 BitField |= self._get_reference_or_value(rs2)
             else:
                 # Register access
-                logger.debug('%s register access instruction', instr)
+                logger.debug("%s register access instruction", instr)
                 BitField |= 0b1110 << 14
                 BitField |= 0b000
-                BitField |= self._get_register_number(rd) << 11     # Place rd
-                BitField |= self._get_register_number(rs) << 8      # Place rs
-                BitField |= self._get_register_number(rs2) << 5     # Place rs2
+                BitField |= self._get_register_number(rd) << 11  # Place rd
+                BitField |= self._get_register_number(rs) << 8  # Place rs
+                BitField |= self._get_register_number(rs2) << 5  # Place rs2
         elif instr == "addc":
             if self._check_if_immed_instr(rs2):
                 # Immediate access
-                logger.debug('%s immediate instruction', instr)
+                logger.debug("%s immediate instruction", instr)
                 BitField |= 0b0001 << 14
-                BitField |= self._get_register_number(rd) << 11     # Place rd
-                BitField |= self._get_register_number(rs) << 8      # Place rs
+                BitField |= self._get_register_number(rd) << 11  # Place rd
+                BitField |= self._get_register_number(rs) << 8  # Place rs
                 BitField |= self._get_reference_or_value(rs2)
             else:
                 # Register access
-                logger.debug('%s register access instruction', instr)
+                logger.debug("%s register access instruction", instr)
                 BitField |= 0b1110 << 14
                 BitField |= 0b001
-                BitField |= self._get_register_number(rd) << 11     # Place rd
-                BitField |= self._get_register_number(rs) << 8      # Place rs
-                BitField |= self._get_register_number(rs2) << 5     # Place rs2
+                BitField |= self._get_register_number(rd) << 11  # Place rd
+                BitField |= self._get_register_number(rs) << 8  # Place rs
+                BitField |= self._get_register_number(rs2) << 5  # Place rs2
         elif instr == "sub":
             if self._check_if_immed_instr(rs2):
                 # Immediate access
-                logger.debug('%s immediate instruction', instr)
+                logger.debug("%s immediate instruction", instr)
                 BitField |= 0b0010 << 14
-                BitField |= self._get_register_number(rd) << 11     # Place rd
-                BitField |= self._get_register_number(rs) << 8      # Place rs
-                BitField |= self._get_reference_or_value(rs2)       # Place rs2
+                BitField |= self._get_register_number(rd) << 11  # Place rd
+                BitField |= self._get_register_number(rs) << 8  # Place rs
+                BitField |= self._get_reference_or_value(rs2)  # Place rs2
             else:
                 # Register access
-                logger.debug('%s sing AJAXregister access instruction', instr)
+                logger.debug("%s sing AJAXregister access instruction", instr)
                 BitField |= 0b1110 << 14
                 BitField |= 0b010
-                BitField |= self._get_register_number(rd) << 11     # Place rd
-                BitField |= self._get_register_number(rs) << 8      # Place rs
-                BitField |= self._get_register_number(rs2) << 5     # Place rs2
+                BitField |= self._get_register_number(rd) << 11  # Place rd
+                BitField |= self._get_register_number(rs) << 8  # Place rs
+                BitField |= self._get_register_number(rs2) << 5  # Place rs2
         elif instr == "subc":
             if self._check_if_immed_instr(rs2):
                 # Immediate access
-                logger.debug('%s immediate instruction', instr)
+                logger.debug("%s immediate instruction", instr)
                 BitField |= 0b0011 << 14
-                BitField |= self._get_register_number(rd) << 11     # Place rd
-                BitField |= self._get_register_number(rs) << 8      # Place rs
-                BitField |= self._get_reference_or_value(rs2)       # Place rs2
+                BitField |= self._get_register_number(rd) << 11  # Place rd
+                BitField |= self._get_register_number(rs) << 8  # Place rs
+                BitField |= self._get_reference_or_value(rs2)  # Place rs2
             else:
                 # Register access
-                logger.debug('%s register access instruction', instr)
+                logger.debug("%s register access instruction", instr)
                 BitField |= 0b1110 << 14
                 BitField |= 0b011
-                BitField |= self._get_register_number(rd) << 11     # Place rd
-                BitField |= self._get_register_number(rs) << 8      # Place rs
-                BitField |= self._get_register_number(rs2) << 5     # Place rs2
+                BitField |= self._get_register_number(rd) << 11  # Place rd
+                BitField |= self._get_register_number(rs) << 8  # Place rs
+                BitField |= self._get_register_number(rs2) << 5  # Place rs2
         elif instr == "and":
             if self._check_if_immed_instr(rs2):
                 # Immediate access
-                logger.debug('%s immediate instruction', instr)
+                logger.debug("%s immediate instruction", instr)
                 BitField |= 0b0100 << 14
-                BitField |= self._get_register_number(rd) << 11     # Place rd
-                BitField |= self._get_register_number(rs) << 8      # Place rs
+                BitField |= self._get_register_number(rd) << 11  # Place rd
+                BitField |= self._get_register_number(rs) << 8  # Place rs
                 BitField |= self._get_reference_or_value(rs2)
             else:
                 # Register access
-                logger.debug('%s register access instruction', instr)
+                logger.debug("%s register access instruction", instr)
                 BitField |= 0b1110 << 14
                 BitField |= 0b100
-                BitField |= self._get_register_number(rd) << 11     # Place rd
-                BitField |= self._get_register_number(rs) << 8      # Place rs
-                BitField |= self._get_register_number(rs2) << 5     # Place rs2
+                BitField |= self._get_register_number(rd) << 11  # Place rd
+                BitField |= self._get_register_number(rs) << 8  # Place rs
+                BitField |= self._get_register_number(rs2) << 5  # Place rs2
         elif instr == "or":
             if self._check_if_immed_instr(rs2):
                 # Immediate access
-                logger.debug('%s immediate instruction', instr)
+                logger.debug("%s immediate instruction", instr)
                 BitField |= 0b0101 << 14
-                BitField |= self._get_register_number(rd) << 11     # Place rd
-                BitField |= self._get_register_number(rs) << 8      # Place rs
-                BitField |= self._get_reference_or_value(rs2)       # Place rs2
+                BitField |= self._get_register_number(rd) << 11  # Place rd
+                BitField |= self._get_register_number(rs) << 8  # Place rs
+                BitField |= self._get_reference_or_value(rs2)  # Place rs2
             else:
                 # Register access
-                logger.debug('%s register access instruction', instr)
+                logger.debug("%s register access instruction", instr)
                 BitField |= 0b1110 << 14
                 BitField |= 0b101
-                BitField |= self._get_register_number(rd) << 11     # Place rd
-                BitField |= self._get_register_number(rs) << 8      # Place rs
-                BitField |= self._get_register_number(rs2) << 5     # Place rs2
+                BitField |= self._get_register_number(rd) << 11  # Place rd
+                BitField |= self._get_register_number(rs) << 8  # Place rs
+                BitField |= self._get_register_number(rs2) << 5  # Place rs2
         elif instr == "xor":
             if self._check_if_immed_instr(rs2):
                 # Immediate access
-                logger.debug('%s immediate instruction', instr)
+                logger.debug("%s immediate instruction", instr)
                 BitField |= 0b0110 << 14
-                BitField |= self._get_register_number(rd) << 11     # Place rd
-                BitField |= self._get_register_number(rs) << 8      # Place rs
-                BitField |= self._get_reference_or_value(rs2)       # Place rs2
+                BitField |= self._get_register_number(rd) << 11  # Place rd
+                BitField |= self._get_register_number(rs) << 8  # Place rs
+                BitField |= self._get_reference_or_value(rs2)  # Place rs2
             else:
                 # Register access
-                logger.debug('%s register access instruction', instr)
+                logger.debug("%s register access instruction", instr)
                 BitField |= 0b1110 << 14
                 BitField |= 0b110
-                BitField |= self._get_register_number(rd) << 11     # Place rd
-                BitField |= self._get_register_number(rs) << 8      # Place rs
-                BitField |= self._get_register_number(rs2) << 5     # Place rs2
+                BitField |= self._get_register_number(rd) << 11  # Place rd
+                BitField |= self._get_register_number(rs) << 8  # Place rs
+                BitField |= self._get_register_number(rs2) << 5  # Place rs2
         elif instr == "mask":
             if self._check_if_immed_instr(rs2):
-                    # Immediate access
-                logger.debug('%s immediate instruction', instr)
+                # Immediate access
+                logger.debug("%s immediate instruction", instr)
                 BitField |= 0b0111 << 14
-                BitField |= self._get_register_number(rd) << 11     # Place rd
-                BitField |= self._get_register_number(rs) << 8      # Place rs
-                BitField |= self._get_reference_or_value(rs2)       # Place rs2
+                BitField |= self._get_register_number(rd) << 11  # Place rd
+                BitField |= self._get_register_number(rs) << 8  # Place rs
+                BitField |= self._get_reference_or_value(rs2)  # Place rs2
             else:
                 # Register access
-                logger.debug('%s register access instruction', instr)
+                logger.debug("%s register access instruction", instr)
                 BitField |= 0b1110 << 14
                 BitField |= 0b111
-                BitField |= self._get_register_number(rd) << 11     # Place rd
-                BitField |= self._get_register_number(rs) << 8      # Place rs
-                BitField |= self._get_register_number(rs2) << 5     # Place rs2
+                BitField |= self._get_register_number(rd) << 11  # Place rd
+                BitField |= self._get_register_number(rs) << 8  # Place rs
+                BitField |= self._get_register_number(rs2) << 5  # Place rs2
 
         # Shift instructions
         elif instr == "shl":
-            logger.debug('%s instruction', instr)
+            logger.debug("%s instruction", instr)
             BitField |= 0b110 << 15
             BitField |= 0b00
-            BitField |= self._get_register_number(rd) << 11     # Place rd
-            BitField |= self._get_register_number(rs) << 8      # Place rs
-            BitField |= self._get_reference_or_value(rs2) << 5      # Place rs2
+            BitField |= self._get_register_number(rd) << 11  # Place rd
+            BitField |= self._get_register_number(rs) << 8  # Place rs
+            BitField |= self._get_reference_or_value(rs2) << 5  # Place rs2
         elif instr == "shr":
-            logger.debug('%s instruction', instr)
+            logger.debug("%s instruction", instr)
             BitField |= 0b110 << 15
             BitField |= 0b01
-            BitField |= self._get_register_number(rd) << 11     # Place rd
-            BitField |= self._get_register_number(rs) << 8      # Place rs
-            BitField |= self._get_reference_or_value(rs2) << 5      # Place rs2
+            BitField |= self._get_register_number(rd) << 11  # Place rd
+            BitField |= self._get_register_number(rs) << 8  # Place rs
+            BitField |= self._get_reference_or_value(rs2) << 5  # Place rs2
         elif instr == "rol":
-            logger.debug('%s instruction', instr)
+            logger.debug("%s instruction", instr)
             BitField |= 0b110 << 15
             BitField |= 0b10
-            BitField |= self._get_register_number(rd) << 11     # Place rd
-            BitField |= self._get_register_number(rs) << 8      # Place rs
-            BitField |= self._get_reference_or_value(rs2) << 5      # Place rs2
+            BitField |= self._get_register_number(rd) << 11  # Place rd
+            BitField |= self._get_register_number(rs) << 8  # Place rs
+            BitField |= self._get_reference_or_value(rs2) << 5  # Place rs2
         elif instr == "ror":
-            logger.debug('%s instruction', instr)
+            logger.debug("%s instruction", instr)
             BitField |= 0b110 << 15
             BitField |= 0b11
-            BitField |= self._get_register_number(rd) << 11     # Place rd
-            BitField |= self._get_register_number(rs) << 8      # Place rs
-            BitField |= self._get_reference_or_value(rs2) << 5      # Place rs2
+            BitField |= self._get_register_number(rd) << 11  # Place rd
+            BitField |= self._get_register_number(rs) << 8  # Place rs
+            BitField |= self._get_reference_or_value(rs2) << 5  # Place rs2
 
         # Memory and I/O instructions
         elif instr == "ldm":
-            logger.debug('%s instruction', instr)
+            logger.debug("%s instruction", instr)
             BitField |= 0b10 << 16
             BitField |= 0b00 << 14
-            BitField |= self._get_register_number(rd) << 11     # Place rd
+            BitField |= self._get_register_number(rd) << 11  # Place rd
             if self._get_register_number(rs) == -1:
                 # Direct offset
                 source = 0
@@ -598,10 +598,10 @@ class GumnutAssembler:
             BitField |= source << 8
             BitField |= offset
         elif instr == "stm":
-            logger.debug('%s instruction', instr)
+            logger.debug("%s instruction", instr)
             BitField |= 0b10 << 16
             BitField |= 0b01 << 14
-            BitField |= self._get_register_number(rd) << 11     # Place rd
+            BitField |= self._get_register_number(rd) << 11  # Place rd
             if self._get_register_number(rs) == -1:
                 # Direct offset
                 source = 0
@@ -614,10 +614,10 @@ class GumnutAssembler:
             BitField |= source << 8
             BitField |= offset
         elif instr == "inp":
-            logger.debug('%s instruction', instr)
+            logger.debug("%s instruction", instr)
             BitField |= 0b10 << 16
             BitField |= 0b10 << 14
-            BitField |= self._get_register_number(rd) << 11     # Place rd
+            BitField |= self._get_register_number(rd) << 11  # Place rd
             if self._get_register_number(rs) == -1:
                 # Direct offset
                 source = 0
@@ -630,10 +630,10 @@ class GumnutAssembler:
             BitField |= source << 8
             BitField |= offset
         elif instr == "out":
-            logger.debug('%s instruction', instr)
+            logger.debug("%s instruction", instr)
             BitField |= 0b10 << 16
             BitField |= 0b11 << 14
-            BitField |= self._get_register_number(rd) << 11     # Place rd
+            BitField |= self._get_register_number(rd) << 11  # Place rd
             if self._get_register_number(rs) == -1:
                 # Direct offset
                 source = 0
@@ -648,69 +648,65 @@ class GumnutAssembler:
 
         # Branch instructions
         elif instr == "bz":
-            logger.debug('%s instruction', instr)
+            logger.debug("%s instruction", instr)
             BitField |= 0b111110 << 12
             BitField |= 0b00 << 10
-            disp = (self._get_reference_or_value(rd) - 1 -
-                    self.InstrMemPointer) & 0xFF
+            disp = (self._get_reference_or_value(rd) - 1 - self.InstrMemPointer) & 0xFF
             BitField |= disp
         elif instr == "bnz":
-            logger.debug('%s instruction', instr)
+            logger.debug("%s instruction", instr)
             BitField |= 0b111110 << 12
             BitField |= 0b01 << 10
-            disp = (self._get_reference_or_value(rd) - 1 -
-                    self.InstrMemPointer) & 0xFF
+            disp = (self._get_reference_or_value(rd) - 1 - self.InstrMemPointer) & 0xFF
             BitField |= disp
         elif instr == "bc":
-            logger.debug('%s instruction', instr)
+            logger.debug("%s instruction", instr)
             BitField |= 0b111110 << 12
             BitField |= 0b10 << 10
-            disp = (self._get_reference_or_value(rd) - 1 -
-                    self.InstrMemPointer) & 0xFF
+            disp = (self._get_reference_or_value(rd) - 1 - self.InstrMemPointer) & 0xFF
             BitField |= disp
         elif instr == "bnc":
-            logger.debug('%s instruction', instr)
+            logger.debug("%s instruction", instr)
             BitField |= 0b111110 << 12
             BitField |= 0b11 << 10
-            disp = (self._get_reference_or_value(rd) - 1 -
-                    self.InstrMemPointer) & 0xFF
+            disp = (self._get_reference_or_value(rd) - 1 - self.InstrMemPointer) & 0xFF
             BitField |= disp
 
         # Jump instructions
         elif instr == "jmp":
-            logger.debug('%s instruction', instr)
+            logger.debug("%s instruction", instr)
             BitField |= 0b11110 << 13
             BitField |= 0b0 << 12
             BitField |= self._get_reference_or_value(rd) & 0xFFF
         elif instr == "jsb":
-            logger.debug('%s instruction', instr)
+            logger.debug("%s instruction", instr)
             BitField |= 0b11110 << 13
             BitField |= 0x1 << 12
             BitField |= self._get_reference_or_value(rd) & 0xFFF
 
         # Others
         elif instr == "ret":
-            logger.debug('%s instruction', instr)
+            logger.debug("%s instruction", instr)
             BitField |= 0b1111110 << 11
             BitField |= 0b000 << 8
         elif instr == "reti":
-            logger.debug('%s instruction', instr)
+            logger.debug("%s instruction", instr)
             BitField |= 0b1111110 << 11
             BitField |= 0b001 << 8
         elif instr == "enai":
-            logger.debug('%s instruction', instr)
+            logger.debug("%s instruction", instr)
             BitField |= 0b1111110 << 11
             BitField |= 0b010 << 8
         elif instr == "disi":
-            logger.debug('%s instruction', instr)
+            logger.debug("%s instruction", instr)
             BitField |= 0b1111110 << 11
             BitField |= 0b011 << 8
         elif instr == "wait":
-            logger.debug('%s instruction', instr)
+            logger.debug("%s instruction", instr)
             BitField |= 0b1111110 << 11
             BitField |= 0b100 << 8
         elif instr == "stby":
-            logger.debug('%s instruction', instr)
+            logger.debug("%s instruction", instr)
             BitField |= 0b1111110 << 11
             BitField |= 0b101 << 8
         return BitField
@@ -733,17 +729,15 @@ class GumnutAssembler:
                 continue
             else:
                 result = self._assemble_source_line(line)
-                if (result != -1):
-                    if (self.InstrMemPointer > 4095):
-                        raise InstructionMemorySizeExceeded(
-                            self.InstrMemPointer,
-                            'Maximum instruction memory size hit')
+                if result != -1:
+                    if self.InstrMemPointer > 4095:
+                        raise InstructionMemorySizeExceeded(self.InstrMemPointer, "Maximum instruction memory size hit")
 
                     self.InstrList[self.InstrMemPointer] = result
 
                     for line_number, value in self.source_objectcode_map.items():
                         if value[1] == line and (line_number in used_dict_entry) == False:
-                            #print(line_number)
+                            # print(line_number)
                             used_dict_entry.append(line_number)
                             old_value = self.source_objectcode_map[line_number]
                             new_value = (old_value[0], old_value[1], result, self.InstrMemPointer)
@@ -752,24 +746,24 @@ class GumnutAssembler:
 
                     self.InstrCount += 1
                     self.InstrMemPointer += 1
-                    #logger.debug('Insert instruction "%s" @ %d', result, 
+                    # logger.debug('Insert instruction "%s" @ %d', result,
                     #             self.InstrMemPointer)
                 else:
                     continue
 
-    def create_output_files(self, datafilename='gasm_data.dat', textfilename='gasm_text.dat'):
+    def create_output_files(self, datafilename="gasm_data.dat", textfilename="gasm_text.dat"):
         """
         Create output files
         """
         # Open/Create output files
 
-        with open(textfilename, 'w') as textfile:
+        with open(textfilename, "w") as textfile:
             for bitfield in self.InstrList:
-                textfile.write(str("%x" % bitfield)+"\n")
+                textfile.write(str("%x" % bitfield) + "\n")
 
-        with open(datafilename, 'w') as datafile:
+        with open(datafilename, "w") as datafile:
             for data in self.DataList:
-                datafile.write(str("%x" % int(data))+"\n")
+                datafile.write(str("%x" % int(data)) + "\n")
 
     def get_instruction_memory(self):
         """
@@ -785,31 +779,28 @@ class GumnutAssembler:
 
     # ..
     def print_source_objcode_map(self):
-        print("%-8s%-80s%-10s%-10s" % ('Line', 'Source', 'OBJCode', 'Address'))
+        print("%-8s%-80s%-10s%-10s" % ("Line", "Source", "OBJCode", "Address"))
         for line_number, value in self.source_objectcode_map.items():
             if value[2] and value[3]:
-                print("%-8s%-80s%-10s%-10s" % (line_number, value[0],
-                                               hex(value[2]), hex(value[3])))
+                print("%-8s%-80s%-10s%-10s" % (line_number, value[0], hex(value[2]), hex(value[3])))
             else:
                 print("%-8s%-80s" % (line_number, value[0]))
         return
 
     def _validate_asm_line(self, asm_line):
-        if (asm_line.instruction is not None):
+        if asm_line.instruction is not None:
             # Get requirements for the instruction
             filter = lambda x: x.instruction == asm_line.instruction
             for x in self.instruction_set_requirements:
                 if filter(x):
                     return True
-            raise InvalidInstruction(asm_line.__str__(), 'Unknown instruction')
+            raise InvalidInstruction(asm_line.__str__(), "Unknown instruction")
         else:
             return True
 
 
 class GasmLine:
-
-    def __init__(self, label=None, instruction=None, rd=None, op1=None,
-                 op2=None):
+    def __init__(self, label=None, instruction=None, rd=None, op1=None, op2=None):
         self.label = label
         self.instruction = instruction
         self.rd = rd
@@ -820,8 +811,13 @@ class GasmLine:
         return self.__dict__ == other.__dict__
 
     def is_empty(self):
-        if (self.label is None and self.instruction is None and self.rd is None
-            and self.op1 is None and self.op2 is None):
+        if (
+            self.label is None
+            and self.instruction is None
+            and self.rd is None
+            and self.op1 is None
+            and self.op2 is None
+        ):
             return True
         else:
             return False
@@ -829,23 +825,22 @@ class GasmLine:
     def __str__(self):
         output_str = ""
         if self.label:
-            output_str += self.label + ' '
+            output_str += self.label + " "
         if self.instruction:
-            output_str += self.instruction + ' '
+            output_str += self.instruction + " "
         if self.rd:
-            output_str += str(self.rd) + ' '
+            output_str += str(self.rd) + " "
         if self.op1:
-            output_str += str(self.op1) + ' '
+            output_str += str(self.op1) + " "
         if self.op2:
-            output_str += str(self.op2) + ' '
+            output_str += str(self.op2) + " "
         return output_str
 
     def __repr__(self):
-        return '<GasmLine> ' + self.__str__()
+        return "<GasmLine> " + self.__str__()
 
 
 class GasmInstruction:
-
     def __init__(self, instruction=None, rd=False, op1=False, op2=False):
         self.instruction = instruction
         self.rd = rd
