@@ -757,21 +757,19 @@ class GumnutAssembler:
                 else:
                     continue
 
-    def create_output_files(self):
+    def create_output_files(self, datafilename='gasm_data.dat', textfilename='gasm_text.dat'):
         """
         Create output files
         """
         # Open/Create output files
-        self.datafile = open('gasm_data.dat', 'w')
-        self.textfile = open('gasm_text.dat', 'w')
 
-        for bitfield in self.InstrList:
-            self.textfile.write(str("%x" % bitfield)+"\n")
-        self.textfile.close()
+        with open(textfilename, 'w') as textfile:
+            for bitfield in self.InstrList:
+                textfile.write(str("%x" % bitfield)+"\n")
 
-        for data in self.DataList:
-            self.datafile.write(str("%x" % int(data))+"\n")
-        self.datafile.close()
+        with open(datafilename, 'w') as datafile:
+            for data in self.DataList:
+                datafile.write(str("%x" % int(data))+"\n")
 
     def get_instruction_memory(self):
         """
