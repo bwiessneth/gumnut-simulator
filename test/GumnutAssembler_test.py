@@ -3,10 +3,9 @@ __author__ = 'BW'
 # Add current directory to PYTHONPATH
 import os, sys
 sys.path.insert(0, os.getcwd())
-#print('sys.path = ', sys.path)
-print('sys.path = ', sys.path)
 
 import unittest
+import shutil
 
 from GumnutSimulator import GumnutAssembler
 
@@ -298,7 +297,7 @@ class TestGumnutAssembler(unittest.TestCase):
 
     def test_objectcode_comparison(self):
         import subprocess
-        source_directory = 'tests/asm_source/'
+        source_directory = 'test/asm_source/'
         sample_sources = ['sample.gsm', 'sensor_isr.gsm', 'polling_loop.gsm',
                           'rtc_handler.gsm', 'jmp.gsm', 'bz_bnz.gsm', 'bc_bnc.gsm', 'ldm.gsm' ] #, 'limits.gsm'
 
@@ -309,15 +308,16 @@ class TestGumnutAssembler(unittest.TestCase):
             asm.create_output_files()
 
             # Move the generated files into the test/gasm/ directory
-            subprocess.call(['mv', 'gasm_text.dat', 'tests/gasm/'])
-            subprocess.call(['mv', 'gasm_data.dat', 'tests/gasm/'])
+            shutil.move('gasm_text.dat', 'test/gasm/gasm_text.dat')
+            shutil.move('gasm_data.dat', 'test/gasm/gasm_data.dat')
 
             # Call gasm assembler
-            subprocess.call(['java', '-cp', 'tests/gasm/Gasm.jar:tests/gasm/antlr.jar:test/gasm/', 'Gasm', source_directory + source, '-t','tests/gasm/gasm_text_golden.dat','-d','tests/gasm/gasm_data_golden.dat'])
+            # java -classpath Gasm.jar;antlr.jar; Gasm ..\asm_source\sample.gsm
+            subprocess.run(['java', '-classpath', 'test/gasm/Gasm.jar;test/gasm/antlr.jar;test/gasm/', 'Gasm', source_directory + source, '-t','test/gasm/gasm_text_golden.dat','-d','test/gasm/gasm_data_golden.dat'],shell=True, check=True)
 
             # Create md5 hash and compare outputs
-            self.assertEqual(self.generate_md5('/tests/gasm/gasm_text_golden.dat'), self.generate_md5('/tests/gasm/gasm_text.dat'))
-            self.assertEqual(self.generate_md5('/tests/gasm/gasm_data_golden.dat'), self.generate_md5('/tests/gasm/gasm_data.dat'))
+            self.assertEqual(self.generate_md5('/test/gasm/gasm_text_golden.dat'), self.generate_md5('/test/gasm/gasm_text.dat'))
+            self.assertEqual(self.generate_md5('/test/gasm/gasm_data_golden.dat'), self.generate_md5('/test/gasm/gasm_data.dat'))
 
 
 if __name__ == "__main__":
