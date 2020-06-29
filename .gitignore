@@ -18,3 +18,5 @@ coverage.xml
 .pytest_cache/
 cover/
 
+# Assembler output dir
+asm_output
