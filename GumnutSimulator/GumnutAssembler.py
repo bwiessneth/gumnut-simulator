@@ -3,7 +3,7 @@ __author__ = "BW"
 from collections import OrderedDict
 from .GumnutExceptions import *
 import re
-
+import os
 import logging
 
 logger = logging.getLogger("root")
@@ -751,19 +751,20 @@ class GumnutAssembler:
                 else:
                     continue
 
-    def create_output_files(self, datafilename="gasm_data.dat", textfilename="gasm_text.dat"):
+    def create_output_files(self, datafile="gasm_data.dat", textfile="gasm_text.dat"):
         """
         Create output files
         """
         # Open/Create output files
-
-        with open(textfilename, "w") as textfile:
+        os.makedirs(os.path.dirname(os.path.normpath(datafile)), exist_ok=True)
+        with open(textfile, "w") as tf:
             for bitfield in self.InstrList:
-                textfile.write(str("%x" % bitfield) + "\n")
+                tf.write(str("%x" % bitfield) + "\n")
 
-        with open(datafilename, "w") as datafile:
+        os.makedirs(os.path.dirname(textfile), exist_ok=True)
+        with open(datafile, "w") as df:
             for data in self.DataList:
-                datafile.write(str("%x" % int(data)) + "\n")
+                df.write(str("%x" % int(data)) + "\n")
 
     def get_instruction_memory(self):
         """
