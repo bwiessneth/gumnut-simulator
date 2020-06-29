@@ -1,12 +1,13 @@
 __author__ = "BW"
 
-# Add current directory to PYTHONPATH
+
 import os, sys
-
-sys.path.insert(0, os.getcwd())
-
+import hashlib
 import unittest
 import shutil
+
+sys.path.insert(0, os.getcwd())  # Add current directory to PYTHONPATH
+
 
 from GumnutSimulator import GumnutAssembler
 
@@ -298,12 +299,8 @@ class TestGumnutAssembler(unittest.TestCase):
         self.assertEqual(asm._assemble_source_line(GasmLine(None, "stby", None, None, None)), 0x3F500)
 
     def generate_md5(self, filename):
-        import hashlib  # Import hashlib library (md5 method)
-        import os  # Import os library (getcwd method)
-
-        # Open,close, read file and calculate MD5 on its contents
         path = os.path.join(os.getcwd(), filename)
-        with open(path, "rb") as f:
+        with open(filename, "rb") as f:
             data = f.read()
             return hashlib.md5(data).hexdigest()
 
