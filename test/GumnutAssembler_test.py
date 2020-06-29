@@ -287,7 +287,7 @@ class TestGumnutAssembler(unittest.TestCase):
         import os       # Import os library (getcwd method)
 
         # Open,close, read file and calculate MD5 on its contents
-        path=os.getcwd()+filename
+        path = os.path.join(os.getcwd(), filename)
         with open(path, 'rb') as f:
             data = f.read()
             return hashlib.md5(data).hexdigest()
@@ -298,26 +298,29 @@ class TestGumnutAssembler(unittest.TestCase):
     def test_objectcode_comparison(self):
         import subprocess
         source_directory = 'test/asm_source/'
+        output_directory = 'test/asm_output/'
+        gasm_directory = 'test/gasm_output/'
         sample_sources = ['sample.gsm', 'sensor_isr.gsm', 'polling_loop.gsm',
                           'rtc_handler.gsm', 'jmp.gsm', 'bz_bnz.gsm', 'bc_bnc.gsm', 'ldm.gsm' ] #, 'limits.gsm'
 
         for source in sample_sources:
+            source_name, source_ext = os.path.splitext(source)
+            datafile = os.path.join(output_directory, source_name+'_data.dat')
+            textfile = os.path.join(output_directory, source_name+'_text.dat')
+            gasm_datafile = os.path.join(gasm_directory, source_name+'_data.dat')
+            gasm_textfile = os.path.join(gasm_directory, source_name+'_text.dat')
+
             asm = GumnutAssembler.GumnutAssembler()
             asm.load_asm_source_from_file(source_directory + source)
             asm.assemble()
-            asm.create_output_files()
-
-            # Move the generated files into the test/gasm/ directory
-            shutil.move('gasm_text.dat', 'test/gasm/gasm_text.dat')
-            shutil.move('gasm_data.dat', 'test/gasm/gasm_data.dat')
+            asm.create_output_files(datafile=datafile, textfile=textfile)
 
             # Call gasm assembler
-            # java -classpath Gasm.jar;antlr.jar; Gasm ..\asm_source\sample.gsm
-            subprocess.run(['java', '-classpath', 'test/gasm/Gasm.jar;test/gasm/antlr.jar;test/gasm/', 'Gasm', source_directory + source, '-t','test/gasm/gasm_text_golden.dat','-d','test/gasm/gasm_data_golden.dat'],shell=True, check=True)
+            # subprocess.run(['java', '-classpath', 'test/gasm/Gasm.jar;test/gasm/antlr.jar;test/gasm/', 'Gasm', source_directory + source, '-t','test/gasm_output/'+source_name+'_text.dat','-d','test/gasm_output/'+source_name+'_data.dat'], shell=True, check=True)
 
             # Create md5 hash and compare outputs
-            self.assertEqual(self.generate_md5('/test/gasm/gasm_text_golden.dat'), self.generate_md5('/test/gasm/gasm_text.dat'))
-            self.assertEqual(self.generate_md5('/test/gasm/gasm_data_golden.dat'), self.generate_md5('/test/gasm/gasm_data.dat'))
+            self.assertEqual(self.generate_md5(textfile), self.generate_md5(gasm_textfile))
+            self.assertEqual(self.generate_md5(datafile), self.generate_md5(gasm_datafile))
 
 
 if __name__ == "__main__":
