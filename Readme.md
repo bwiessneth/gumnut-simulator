@@ -1,8 +1,5 @@
 # Gumnut Softcore Simulator
 
-Requires python3.4
-
-
 ## Virtual environment
 
 To ensure a persistent and encapsulated environment over several machines 
