@@ -1,15 +1,12 @@
 __author__ = "BW"
 
-
-import os, sys
+import os
+import sys
 import hashlib
 import unittest
-import shutil
 
 sys.path.insert(0, os.getcwd())  # Add current directory to PYTHONPATH
-
-
-from GumnutSimulator import GumnutAssembler
+from GumnutSimulator import GumnutAssembler  # noqa: E402
 
 
 class TestGumnutAssembler(unittest.TestCase):
@@ -299,15 +296,13 @@ class TestGumnutAssembler(unittest.TestCase):
         self.assertEqual(asm._assemble_source_line(GasmLine(None, "stby", None, None, None)), 0x3F500)
 
     def generate_md5(self, filename):
-        path = os.path.join(os.getcwd(), filename)
         with open(filename, "rb") as f:
             data = f.read()
             return hashlib.md5(data).hexdigest()
-
         return -1
 
     def test_objectcode_comparison(self):
-        import subprocess
+        # import subprocess
 
         source_directory = "test/asm_source/"
         output_directory = "test/asm_output/"
@@ -335,8 +330,11 @@ class TestGumnutAssembler(unittest.TestCase):
             asm.assemble()
             asm.create_output_files(datafile=datafile, textfile=textfile)
 
-            # Call gasm assembler
-            # subprocess.run(['java', '-classpath', 'test/gasm/Gasm.jar;test/gasm/antlr.jar;test/gasm/', 'Gasm', source_directory + source, '-t','test/gasm_output/'+source_name+'_text.dat','-d','test/gasm_output/'+source_name+'_data.dat'], shell=True, check=True)
+            # Call gasm assembler subprocess.run(['java', '-classpath',
+            # 'test/gasm/Gasm.jar;test/gasm/antlr.jar;test/gasm/', 'Gasm',
+            # source_directory + source,
+            # '-t','test/gasm_output/'+source_name+'_text.dat','-d','test/gasm_output/'+source_name+'_data.dat'],
+            # shell=True, check=True)
 
             # Create md5 hash and compare outputs
             self.assertEqual(self.generate_md5(textfile), self.generate_md5(gasm_textfile))

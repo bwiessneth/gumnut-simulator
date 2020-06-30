@@ -1,53 +1,46 @@
-__author__ = 'BW'
+__author__ = "BW"
 
 # Add current directory to PYTHONPATH
 import os
 import sys
-sys.path.insert(0, os.getcwd())
-#print('sys.path = ', sys.path)
-
-
 import unittest
 import random
-from GumnutSimulator import GumnutCore
-from GumnutSimulator import GumnutExceptions
+
+sys.path.insert(0, os.getcwd())  # Add current directory to PYTHONPATH
+from GumnutSimulator import GumnutCore  # noqa: E402
+from GumnutSimulator import GumnutExceptions  # noqa: E402
 
 
 class TestGumnutCore(unittest.TestCase):
-
     def test_fetch_limits(self):
         core = GumnutCore.GumnutCore()
         core.PC = -1
-        self.assertRaises(
-            GumnutExceptions.InvalidPCValue, lambda: core.fetch())
+        self.assertRaises(GumnutExceptions.InvalidPCValue, lambda: core.fetch())
         core.PC = 4098
-        self.assertRaises(
-            GumnutExceptions.InvalidPCValue, lambda: core.fetch())
+        self.assertRaises(GumnutExceptions.InvalidPCValue, lambda: core.fetch())
         try:
             core.PC = 128
             core.fetch()
             raised = False
         except:
             raised = True
-        self.assertFalse(raised, 'Exception raised')
+        self.assertFalse(raised, "Exception raised")
 
     def test_update_PC_limits(self):
         core = GumnutCore.GumnutCore()
         core.PC = 4093
-        core.update_PC()    # 4094
-        core.update_PC()    # 4095
-        self.assertRaises(
-            GumnutExceptions.InvalidPCValue, lambda: core.update_PC())  # 4096
+        core.update_PC()  # 4094
+        core.update_PC()  # 4095
+        self.assertRaises(GumnutExceptions.InvalidPCValue, lambda: core.update_PC())  # 4096
         core.PC = -100
-        self.assertRaises(
-            GumnutExceptions.InvalidPCValue, lambda: core.update_PC())
+        self.assertRaises(GumnutExceptions.InvalidPCValue, lambda: core.update_PC())
         try:
             core.PC = 128
-            core.update_PC()    # 129
+            core.update_PC()  # 129
             raised = False
         except:
             raised = True
-        self.assertFalse(raised, 'Exception raised')
+        self.assertFalse(raised, "Exception raised")
 
     def test_unknown_instructions(self):
         # core = GumnutCore.GumnutCore()
@@ -57,41 +50,40 @@ class TestGumnutCore(unittest.TestCase):
     def test_upload_instruction_memory(self):
         core = GumnutCore.GumnutCore()
         test_data = [int(1000 * random.random()) for i in range(4097)]
-        self.assertRaises(GumnutExceptions.InstructionMemorySizeExceeded,
-                          lambda: core.upload_instruction_memory(test_data))
+        self.assertRaises(
+            GumnutExceptions.InstructionMemorySizeExceeded, lambda: core.upload_instruction_memory(test_data)
+        )
         try:
             test_data = [int(1000 * random.random()) for i in range(4096)]
             core.upload_instruction_memory(test_data)
             raised = False
         except:
             raised = True
-        self.assertFalse(raised, 'Exception raised')
+        self.assertFalse(raised, "Exception raised")
 
     def test_upload_data_memory(self):
         core = GumnutCore.GumnutCore()
         test_data = [int(1000 * random.random()) for i in range(257)]
-        self.assertRaises(
-            GumnutExceptions.DataMemorySizeExceeded,
-            lambda: core.upload_data_memory(test_data))
+        self.assertRaises(GumnutExceptions.DataMemorySizeExceeded, lambda: core.upload_data_memory(test_data))
         try:
             test_data = [int(1000 * random.random()) for i in range(256)]
             core.upload_data_memory(test_data)
             raised = False
         except:
             raised = True
-        self.assertFalse(raised, 'Exception raised')
+        self.assertFalse(raised, "Exception raised")
 
     def test_check_data_memory_access(self):
         core = GumnutCore.GumnutCore()
-        self.assertRaises(GumnutExceptions.DataMemoryAccessViolation,
-                          lambda: core.check_data_memory_access(
-                            core.data_memory_size + 1))
+        self.assertRaises(
+            GumnutExceptions.DataMemoryAccessViolation, lambda: core.check_data_memory_access(core.data_memory_size + 1)
+        )
         try:
             core.check_data_memory_access(core.data_memory_size)
             raised = False
         except:
             raised = True
-        self.assertFalse(raised, 'Exception raised')
+        self.assertFalse(raised, "Exception raised")
 
     def test_add_instruction(self):
         return
