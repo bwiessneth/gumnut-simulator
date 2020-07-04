@@ -190,7 +190,7 @@ class GumnutAssembler:
         """
         # Generate regex pattern
         pattern = re.compile(
-            "^\s*(?:([A-Za-z]\w*)[:])?(?:\s*([A-Za-z]{2,4})(?:\s+([A-Za-z0-9+-]\w*)(?:\s)*(?:[,])*(?:\s)*(?:[\(])*(?:\s*)([A-Za-z0-9]\w*)?(?:\s)*(?:[\)])*(?:\s*[,]*\s*([A-Za-z0-9\+\-\ \_]*))?)?)?"
+            r"^\s*(?:([A-Za-z]\w*)[:])?(?:\s*([A-Za-z]{2,4})(?:\s+([A-Za-z0-9+-]\w*)(?:\s)*(?:[,])*(?:\s)*(?:[\(])*(?:\s*)([A-Za-z0-9]\w*)?(?:\s)*(?:[\)])*(?:\s*[,]*\s*([A-Za-z0-9\+\-\ \_]*))?)?)?"
         )
 
         # Match regex pattern against current line
