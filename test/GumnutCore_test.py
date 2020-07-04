@@ -1,232 +1,224 @@
 __author__ = "BW"
 
-# Add current directory to PYTHONPATH
-import os
-import sys
-import unittest
 import random
+import pytest
 
-sys.path.insert(0, os.getcwd())  # Add current directory to PYTHONPATH
 from GumnutSimulator import GumnutCore  # noqa: E402
 from GumnutSimulator import GumnutExceptions  # noqa: E402
+from GumnutSimulator.GumnutDecoder import INSTR
 
 
-class TestGumnutCore(unittest.TestCase):
-    def test_fetch_limits(self):
-        core = GumnutCore.GumnutCore()
-        core.PC = -1
-        self.assertRaises(GumnutExceptions.InvalidPCValue, lambda: core.fetch())
-        core.PC = 4098
-        self.assertRaises(GumnutExceptions.InvalidPCValue, lambda: core.fetch())
-        try:
-            core.PC = 128
-            core.fetch()
-            raised = False
-        except:
-            raised = True
-        self.assertFalse(raised, "Exception raised")
-
-    def test_update_PC_limits(self):
-        core = GumnutCore.GumnutCore()
-        core.PC = 4093
-        core.update_PC()  # 4094
-        core.update_PC()  # 4095
-        self.assertRaises(GumnutExceptions.InvalidPCValue, lambda: core.update_PC())  # 4096
-        core.PC = -100
-        self.assertRaises(GumnutExceptions.InvalidPCValue, lambda: core.update_PC())
-        try:
-            core.PC = 128
-            core.update_PC()  # 129
-            raised = False
-        except:
-            raised = True
-        self.assertFalse(raised, "Exception raised")
-
-    def test_unknown_instructions(self):
-        # core = GumnutCore.GumnutCore()
-        # ..
-        pass
-
-    def test_upload_instruction_memory(self):
-        core = GumnutCore.GumnutCore()
-        test_data = [int(1000 * random.random()) for i in range(4097)]
-        self.assertRaises(
-            GumnutExceptions.InstructionMemorySizeExceeded, lambda: core.upload_instruction_memory(test_data)
-        )
-        try:
-            test_data = [int(1000 * random.random()) for i in range(4096)]
-            core.upload_instruction_memory(test_data)
-            raised = False
-        except:
-            raised = True
-        self.assertFalse(raised, "Exception raised")
-
-    def test_upload_data_memory(self):
-        core = GumnutCore.GumnutCore()
-        test_data = [int(1000 * random.random()) for i in range(257)]
-        self.assertRaises(GumnutExceptions.DataMemorySizeExceeded, lambda: core.upload_data_memory(test_data))
-        try:
-            test_data = [int(1000 * random.random()) for i in range(256)]
-            core.upload_data_memory(test_data)
-            raised = False
-        except:
-            raised = True
-        self.assertFalse(raised, "Exception raised")
-
-    def test_check_data_memory_access(self):
-        core = GumnutCore.GumnutCore()
-        self.assertRaises(
-            GumnutExceptions.DataMemoryAccessViolation, lambda: core.check_data_memory_access(core.data_memory_size + 1)
-        )
-        try:
-            core.check_data_memory_access(core.data_memory_size)
-            raised = False
-        except:
-            raised = True
-        self.assertFalse(raised, "Exception raised")
-
-    def test_add_instruction(self):
-        return
-        core = GumnutCore.GumnutCore()
-
-        # r1 = 1
-        instr = GumnutCore.INSTR("add", 0, 1, 1, 1, "immediate")
-        core.execute(instr)
-        self.assertEqual(core.r[1], 1)
-        self.assertEqual(core.CARRY, False)
-        self.assertEqual(core.ZERO, False)
-
-        # r1 = r1 + 1 = 2
-        instr = GumnutCore.INSTR("add", 0, 1, 1, 1, "immediate")
-        core.execute(instr)
-        self.assertEqual(core.r[1], 2)
-        self.assertEqual(core.CARRY, False)
-        self.assertEqual(core.ZERO, False)
-
-        # r1 = r1 + 254 = 256 -> CARRY & r1 = 0
-        instr = GumnutCore.INSTR("add", 0, 1, 1, 254, "immediate")
-        core.execute(instr)
-        self.assertEqual(core.r[1], 0)
-        self.assertEqual(core.CARRY, True)
-        self.assertEqual(core.ZERO, False)
-
-        # r1 = r1 + 2 = 2 -> CARRY == False
-        instr = GumnutCore.INSTR("add", 0, 1, 1, 2, "immediate")
-        core.execute(instr)
-        self.assertEqual(core.r[1], 2)
-        self.assertEqual(core.CARRY, False)
-        self.assertEqual(core.ZERO, False)
-
-        # r1 = r1 + r1 = 4 -> CARRY == False
-        instr = GumnutCore.INSTR("add", 0, 1, 1, 1, "register")
-        core.execute(instr)
-        self.assertEqual(core.r[1], 4)
-        self.assertEqual(core.CARRY, False)
-        self.assertEqual(core.ZERO, False)
-
-    def test_addc_instruction(self):
-        return
-        core = GumnutCore.GumnutCore()
-
-        # r1 = 1
-        instr = GumnutCore.INSTR("addc", 0, 1, 1, 1, "immediate")
-        core.execute(instr)
-        self.assertEqual(core.r[1], 1)
-        self.assertEqual(core.CARRY, False)
-        self.assertEqual(core.ZERO, False)
-
-        # r1 = r1 + 1 = 2
-        instr = GumnutCore.INSTR("addc", 0, 1, 1, 1, "immediate")
-        core.execute(instr)
-        self.assertEqual(core.r[1], 2)
-        self.assertEqual(core.CARRY, False)
-        self.assertEqual(core.ZERO, False)
-
-        # r1 = r1 + 254 = 256 -> CARRY & r1 = 0
-        instr = GumnutCore.INSTR("addc", 0, 1, 1, 254, "immediate")
-        core.execute(instr)
-        self.assertEqual(core.r[1], 0)
-        self.assertEqual(core.CARRY, True)
-        self.assertEqual(core.ZERO, False)
-
-        # r1 = r1 + 2 = 2 -> CARRY == False
-        instr = GumnutCore.INSTR("addc", 0, 1, 1, 2, "immediate")
-        core.execute(instr)
-        self.assertEqual(core.r[1], 3)
-        self.assertEqual(core.CARRY, False)
-        self.assertEqual(core.ZERO, False)
-
-        # r1 = r1 + r1 = 6 -> CARRY == False
-        instr = GumnutCore.INSTR("addc", 0, 1, 1, 1, "register")
-        core.execute(instr)
-        self.assertEqual(core.r[1], 6)
-        self.assertEqual(core.CARRY, False)
-        self.assertEqual(core.ZERO, False)
-
-    def test_sub_instruction(self):
-        return
-        core = GumnutCore.GumnutCore()
-
-        # r1 = 1
-        instr = GumnutCore.INSTR("add", 0, 1, 1, 1, "immediate")
-        core.execute(instr)
-        self.assertEqual(core.r[1], 1)
-        self.assertEqual(core.CARRY, False)
-        self.assertEqual(core.ZERO, False)
-
-        # r1 = r1 - 4 = -3 -> CARRY & r1 = 253
-        instr = GumnutCore.INSTR("sub", 0, 1, 1, 4, "immediate")
-        core.execute(instr)
-        self.assertEqual(core.r[1], 253)
-        self.assertEqual(core.CARRY, True)
-        self.assertEqual(core.ZERO, False)
-
-        # r1 = r1 - 4 = 249 -> CARRY == False
-        instr = GumnutCore.INSTR("sub", 0, 1, 1, 4, "immediate")
-        core.execute(instr)
-        self.assertEqual(core.r[1], 249)
-        self.assertEqual(core.CARRY, False)
-        self.assertEqual(core.ZERO, False)
-
-        # r1 = r1 - r1 = 0 -> CARRY == False
-        instr = GumnutCore.INSTR("sub", 0, 1, 1, 1, "register")
-        core.execute(instr)
-        self.assertEqual(core.r[1], 0)
-        self.assertEqual(core.CARRY, False)
-        self.assertEqual(core.ZERO, True)
-
-    def test_subc_instruction(self):
-        return
-        core = GumnutCore.GumnutCore()
-
-        # r1 = 1
-        instr = GumnutCore.INSTR("add", 0, 1, 1, 1, "immediate")
-        core.execute(instr)
-        self.assertEqual(core.r[1], 1)
-        self.assertEqual(core.CARRY, False)
-        self.assertEqual(core.ZERO, False)
-
-        # r1 = r1 - 4 = -3 -> CARRY & r1 = 253
-        instr = GumnutCore.INSTR("subc", 0, 1, 1, 4, "immediate")
-        core.execute(instr)
-        self.assertEqual(core.r[1], 253)
-        self.assertEqual(core.CARRY, True)
-        self.assertEqual(core.ZERO, False)
-
-        # r1 = r1 - 4 = 249 -> CARRY == False
-        instr = GumnutCore.INSTR("subc", 0, 1, 1, 4, "immediate")
-        core.execute(instr)
-        self.assertEqual(core.r[1], 248)
-        self.assertEqual(core.CARRY, False)
-        self.assertEqual(core.ZERO, False)
-
-        # r1 = r1 - r1 = 0 -> CARRY == False
-        instr = GumnutCore.INSTR("subc", 0, 1, 1, 1, "register")
-        core.execute(instr)
-        self.assertEqual(core.r[1], 0)
-        self.assertEqual(core.CARRY, False)
-        self.assertEqual(core.ZERO, True)
+@pytest.fixture
+def gcore():
+    return GumnutCore.GumnutCore()
 
 
-if __name__ == "__main__":
-    unittest.main()  # run all tests
+def test_fetch_limits(gcore):
+    gcore.PC = 0
+    gcore.fetch()
+
+    with pytest.raises(GumnutExceptions.InvalidPCValue):
+        gcore.PC = -1
+        gcore.fetch()
+
+    gcore.PC = 4095
+    gcore.fetch()
+
+    with pytest.raises(GumnutExceptions.InvalidPCValue):
+        gcore.PC = 4096
+        gcore.fetch()
+
+
+def test_update_PC(gcore):
+    gcore.PC = 0
+    gcore.update_PC()
+    assert gcore.PC == 1
+    gcore.update_PC()
+    assert gcore.PC == 2
+    gcore.update_PC()
+    assert gcore.PC == 3
+
+
+def test_update_PC_limits(gcore):
+    gcore.PC = 4093
+    gcore.update_PC()
+    assert gcore.PC == 4094
+
+    gcore.update_PC()
+    assert gcore.PC == 4095
+
+    with pytest.raises(GumnutExceptions.InvalidPCValue):
+        gcore.update_PC()  # PC = 4096 --> Exception must be raised
+
+    gcore.PC = -100
+    with pytest.raises(GumnutExceptions.InvalidPCValue):
+        gcore.update_PC()
+
+
+def test_upload_instruction_memory(gcore):
+    test_data = [int(1000 * random.random()) for i in range(4096)]
+    gcore.upload_instruction_memory(test_data)
+
+
+def test_upload_instruction_memory_size_exceeded(gcore):
+    test_data = [int(1000 * random.random()) for i in range(4097)]
+    with pytest.raises(GumnutExceptions.InstructionMemorySizeExceeded):
+        gcore.upload_instruction_memory(test_data)
+
+
+def test_upload_data_memory(gcore):
+    test_data = [int(1000 * random.random()) for i in range(256)]
+    gcore.upload_data_memory(test_data)
+
+
+def test_upload_data_memory_size_exceeded(gcore):
+    test_data = [int(1000 * random.random()) for i in range(257)]
+    with pytest.raises(GumnutExceptions.DataMemorySizeExceeded):
+        gcore.upload_data_memory(test_data)
+
+
+def test_check_data_memory_access(gcore):
+    gcore.check_data_memory_access(gcore.data_memory_size)
+
+
+def test_check_data_memory_access_violation(gcore):
+    with pytest.raises(GumnutExceptions.DataMemoryAccessViolation):
+        gcore.check_data_memory_access(gcore.data_memory_size + 1)
+
+
+def test_add_instruction(gcore):
+    assert gcore.r[1] == 0
+    assert not gcore.CARRY
+    assert not gcore.ZERO
+
+    # r1 = 1
+    instr = INSTR("add", 0, 1, 1, 1, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[1] == 1
+    assert not gcore.CARRY
+    assert not gcore.ZERO
+
+    # r1 = r1 + 1 = 2
+    instr = INSTR("add", 0, 1, 1, 1, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[1] == 2
+    assert not gcore.CARRY
+    assert not gcore.ZERO
+
+    # r1 = r1 + 254 = 256 -> CARRY & r1 = 0
+    instr = INSTR("add", 0, 1, 1, 254, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[1] == 0
+    assert gcore.CARRY
+    assert not gcore.ZERO
+
+    # r1 = r1 + 2 = 2 -> CARRY == False
+    instr = INSTR("add", 0, 1, 1, 2, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[1] == 2
+    assert not gcore.CARRY
+    assert not gcore.ZERO
+
+    # r1 = r1 + r1 = 4 -> CARRY == False
+    instr = INSTR("add", 0, 1, 1, 1, "register")
+    gcore.execute(instr)
+    assert gcore.r[1] == 4
+    assert not gcore.CARRY
+    assert not gcore.ZERO
+
+
+def test_addc_instruction(gcore):
+    # r1 = 1
+    instr = INSTR("addc", 0, 1, 1, 1, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[1] == 1
+    assert not gcore.CARRY
+    assert not gcore.ZERO
+
+    # r1 = r1 + 1 = 2
+    instr = INSTR("addc", 0, 1, 1, 1, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[1] == 2
+    assert not gcore.CARRY
+    assert not gcore.ZERO
+
+    # r1 = r1 + 254 = 256 -> CARRY & r1 = 0
+    instr = INSTR("addc", 0, 1, 1, 254, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[1] == 0
+    assert gcore.CARRY
+    assert not gcore.ZERO
+
+    # r1 = r1 + 2 = 2 -> CARRY == False
+    instr = INSTR("addc", 0, 1, 1, 2, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[1] == 3
+    assert not gcore.CARRY
+    assert not gcore.ZERO
+
+    # r1 = r1 + r1 = 6 -> CARRY == False
+    instr = INSTR("addc", 0, 1, 1, 1, "register")
+    gcore.execute(instr)
+    assert gcore.r[1] == 6
+    assert not gcore.CARRY
+    assert not gcore.ZERO
+
+
+def test_sub_instruction(gcore):
+    # r1 = 1
+    instr = INSTR("add", 0, 1, 1, 1, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[1] == 1
+    assert not gcore.CARRY
+    assert not gcore.ZERO
+
+    # r1 = r1 - 4 = -3 -> CARRY & r1 = 253
+    instr = INSTR("sub", 0, 1, 1, 4, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[1] == 253
+    assert gcore.CARRY
+    assert not gcore.ZERO
+
+    # r1 = r1 - 4 = 249 -> CARRY == False
+    instr = INSTR("sub", 0, 1, 1, 4, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[1] == 249
+    assert not gcore.CARRY
+    assert not gcore.ZERO
+
+    # r1 = r1 - r1 = 0 -> CARRY == False
+    instr = INSTR("sub", 0, 1, 1, 1, "register")
+    gcore.execute(instr)
+    assert gcore.r[1] == 0
+    assert not gcore.CARRY
+    assert gcore.ZERO
+
+
+def test_subc_instruction(gcore):
+    # r1 = 1
+    instr = INSTR("add", 0, 1, 1, 1, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[1] == 1
+    assert not gcore.CARRY
+    assert not gcore.ZERO
+
+    # r1 = r1 - 4 = -3 -> CARRY & r1 = 253
+    instr = INSTR("subc", 0, 1, 1, 4, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[1] == 253
+    assert gcore.CARRY
+    assert not gcore.ZERO
+
+    # r1 = r1 - 4 = 249 -> CARRY == False
+    instr = INSTR("subc", 0, 1, 1, 4, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[1] == 248
+    assert not gcore.CARRY
+    assert not gcore.ZERO
+
+    # r1 = r1 - r1 = 0 -> CARRY == False
+    instr = INSTR("subc", 0, 1, 1, 1, "register")
+    gcore.execute(instr)
+    assert gcore.r[1] == 0
+    assert not gcore.CARRY
+    assert gcore.ZERO
