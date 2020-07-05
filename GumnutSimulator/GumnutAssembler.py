@@ -1,7 +1,11 @@
 __author__ = "BW"
 
 from collections import OrderedDict
-from .GumnutExceptions import *
+import os, sys
+sys.path.insert(0, os.getcwd())  # Add current directory to PYTHONPATH
+
+from GumnutSimulator import GumnutExceptions  # noqa: E402
+# import GumnutExceptions
 import re
 import os
 import logging
@@ -731,7 +735,7 @@ class GumnutAssembler:
                 result = self._assemble_source_line(line)
                 if result != -1:
                     if self.InstrMemPointer > 4095:
-                        raise InstructionMemorySizeExceeded(self.InstrMemPointer, "Maximum instruction memory size hit")
+                        raise GumnutExceptions.InstructionMemorySizeExceeded(self.InstrMemPointer, "Maximum instruction memory size hit")
 
                     self.InstrList[self.InstrMemPointer] = result
 
@@ -795,7 +799,7 @@ class GumnutAssembler:
             for x in self.instruction_set_requirements:
                 if filter(x):
                     return True
-            raise InvalidInstruction(asm_line.__str__(), "Unknown instruction")
+            raise GumnutExceptions.InvalidInstruction(asm_line.__str__(), "Unknown instruction")
         else:
             return True
 
@@ -847,3 +851,13 @@ class GasmInstruction:
         self.rd = rd
         self.op1 = op1
         self.op2 = op2
+
+
+if __name__ == '__main__':
+    import argparse
+
+    parser = argparse.ArgumentParser(description='GumnutAssembler')
+    parser.add_argument('source', metavar='sourcefile', type=int, nargs='+',
+                    help='an integer for the accumulator')
+    args = parser.parse_args()
+    
