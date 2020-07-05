@@ -222,3 +222,75 @@ def test_subc_instruction(gcore):
     assert gcore.r[1] == 0
     assert not gcore.CARRY
     assert gcore.ZERO
+
+
+def test_and_instruction(gcore):
+    # r1 = 0
+    # r2 = 0
+    # r3 = 0
+    assert gcore.r[1] == 0
+    assert gcore.r[2] == 0
+    assert gcore.r[3] == 0
+    assert not gcore.CARRY
+    assert not gcore.ZERO
+
+    # r1 = 1
+    instr = INSTR("add", 0, 1, 1, 1, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[1] == 1
+    assert gcore.r[2] == 0
+    assert not gcore.CARRY
+    assert not gcore.ZERO
+
+    # r2 = 1
+    instr = INSTR("add", 0, 2, 2, 1, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[1] == 1
+    assert gcore.r[2] == 1
+    assert not gcore.CARRY
+    assert not gcore.ZERO
+
+    # r3 = (r1 & r2) = 1
+    instr = INSTR("and", 0, 3, 1, 2, "register")
+    gcore.execute(instr)
+    assert gcore.r[1] == 1
+    assert gcore.r[2] == 1
+    assert gcore.r[3] == 1
+    assert not gcore.CARRY
+    assert not gcore.ZERO
+
+
+def test_or_instruction(gcore):
+    # r1 = 0
+    # r2 = 0
+    # r3 = 0
+    assert gcore.r[1] == 0
+    assert gcore.r[2] == 0
+    assert gcore.r[3] == 0
+    assert not gcore.CARRY
+    assert not gcore.ZERO
+
+    # r1 = 1
+    instr = INSTR("add", 0, 1, 1, 1, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[1] == 1
+    assert gcore.r[2] == 0
+    assert not gcore.CARRY
+    assert not gcore.ZERO
+
+    # r2 = 1
+    instr = INSTR("add", 0, 2, 2, 1, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[1] == 1
+    assert gcore.r[2] == 1
+    assert not gcore.CARRY
+    assert not gcore.ZERO
+
+    # r3 = (r1 & r2) = 1
+    instr = INSTR("or", 0, 3, 1, 2, "register")
+    gcore.execute(instr)
+    assert gcore.r[1] == 1
+    assert gcore.r[2] == 1
+    assert gcore.r[3] == 1
+    assert not gcore.CARRY
+    assert not gcore.ZERO
