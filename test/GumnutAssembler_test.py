@@ -5,11 +5,15 @@ import sys
 import hashlib
 import pytest
 
-# sys.path.insert(0, os.getcwd())  # Add current directory to PYTHONPATH
+
+test_path = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, test_path + "/../")
+sys.path.insert(0, "GumnutSimulator")
+sys.path.insert(0, os.getcwd())  # Add current directory to PYTHONPATH
+
 from GumnutSimulator import GumnutAssembler  # noqa: E402
 from GumnutSimulator.GumnutAssembler import GasmLine  # noqa: E402
-from GumnutSimulator import GumnutExceptions  # noqa: E402
-
+import GumnutExceptions  # noqa: E402
 
 
 def generate_md5(filename):
