@@ -868,11 +868,8 @@ def main():
     args = parser.parse_args()
 
     for source in args.sources:
-        if args.name:
-            out_name = args.name
-        else:
-            file_name = os.path.basename(source)
-            out_name, file_ext = os.path.splitext(file_name)
+        file_name = os.path.basename(source)
+        out_name, file_ext = os.path.splitext(file_name)
 
         datafile = os.path.join(args.out_dir, out_name + "_data.dat")
         textfile = os.path.join(args.out_dir, out_name + "_text.dat")
