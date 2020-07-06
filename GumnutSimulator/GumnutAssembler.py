@@ -1,14 +1,12 @@
 __author__ = "BW"
 
 from collections import OrderedDict
-import os, sys
-sys.path.insert(0, os.getcwd())  # Add current directory to PYTHONPATH
 
-from GumnutSimulator import GumnutExceptions  # noqa: E402
-# import GumnutExceptions
 import re
 import os
 import logging
+
+import GumnutExceptions
 
 logger = logging.getLogger("root")
 
@@ -194,7 +192,7 @@ class GumnutAssembler:
         """
         # Generate regex pattern
         pattern = re.compile(
-            r"^\s*(?:([A-Za-z]\w*)[:])?(?:\s*([A-Za-z]{2,4})(?:\s+([A-Za-z0-9+-]\w*)(?:\s)*(?:[,])*(?:\s)*(?:[\(])*(?:\s*)([A-Za-z0-9]\w*)?(?:\s)*(?:[\)])*(?:\s*[,]*\s*([A-Za-z0-9\+\-\ \_]*))?)?)?"
+            r"^\s*(?:([A-Za-z]\w*)[:])?(?:\s*([A-Za-z]{2,4})(?:\s+([A-Za-z0-9+-]\w*)(?:\s)*(?:[,])*(?:\s)*(?:[\(])*(?:\s*)([A-Za-z0-9]\w*)?(?:\s)*(?:[\)])*(?:\s*[,]*\s*([A-Za-z0-9\+\-\ \_]*))?)?)?"  # noqa: E501
         )
 
         # Match regex pattern against current line
@@ -262,7 +260,7 @@ class GumnutAssembler:
         :return: ``True`` if operand is a number or reference
                  ``False`` if operand is register or invalid
         """
-        if type(operand) == None:
+        if type(operand) is None:
             return False
         elif type(operand) == int:
             return True
@@ -297,7 +295,7 @@ class GumnutAssembler:
 
     def _get_reference_or_value(self, operand):
         # Check if operand isn't of type None
-        if type(operand) != None and operand:
+        if type(operand) is not None and operand:
             # Check if operand is a reference
             if self._check_operand_for_reference(operand):
                 # Get reference address from dictionary
@@ -314,7 +312,7 @@ class GumnutAssembler:
         Check if operand is a valid reference
         """
         # Check if operand isn't of type None
-        if type(operand) != None and operand:
+        if type(operand) is not None and operand:
             # Check if op is a digit
             if type(operand) == int or operand.isdigit():
                 return False
@@ -735,12 +733,14 @@ class GumnutAssembler:
                 result = self._assemble_source_line(line)
                 if result != -1:
                     if self.InstrMemPointer > 4095:
-                        raise GumnutExceptions.InstructionMemorySizeExceeded(self.InstrMemPointer, "Maximum instruction memory size hit")
+                        raise GumnutExceptions.InstructionMemorySizeExceeded(
+                            self.InstrMemPointer, "Maximum instruction memory size hit"
+                        )
 
                     self.InstrList[self.InstrMemPointer] = result
 
                     for line_number, value in self.source_objectcode_map.items():
-                        if value[1] == line and (line_number in used_dict_entry) == False:
+                        if value[1] == line and not (line_number in used_dict_entry):
                             # print(line_number)
                             used_dict_entry.append(line_number)
                             old_value = self.source_objectcode_map[line_number]
@@ -755,12 +755,14 @@ class GumnutAssembler:
                 else:
                     continue
 
-    def create_output_files(self, datafile="gasm_data.dat", textfile="gasm_text.dat"):
+    def create_output_files(self, datafile=r"gasm_data.dat", textfile=r"gasm_text.dat"):
         """
         Create output files
         """
         # Open/Create output files
-        os.makedirs(os.path.dirname(os.path.normpath(datafile)), exist_ok=True)
+        # import pdb; pdb.set_trace()
+
+        os.makedirs(os.path.dirname(datafile), exist_ok=True)
         with open(textfile, "w") as tf:
             for bitfield in self.InstrList:
                 tf.write(str("%x" % bitfield) + "\n")
@@ -794,11 +796,12 @@ class GumnutAssembler:
 
     def _validate_asm_line(self, asm_line):
         if asm_line.instruction is not None:
+
             # Get requirements for the instruction
-            filter = lambda x: x.instruction == asm_line.instruction
-            for x in self.instruction_set_requirements:
-                if filter(x):
-                    return True
+            # TODO: Only instruction is evaluated as of now. Extend by rd, op1, op2
+            if any(x.instruction == asm_line.instruction for x in self.instruction_set_requirements):
+                return True
+
             raise GumnutExceptions.InvalidInstruction(asm_line.__str__(), "Unknown instruction")
         else:
             return True
@@ -853,11 +856,32 @@ class GasmInstruction:
         self.op2 = op2
 
 
-if __name__ == '__main__':
+def main():
     import argparse
 
-    parser = argparse.ArgumentParser(description='GumnutAssembler')
-    parser.add_argument('source', metavar='sourcefile', type=int, nargs='+',
-                    help='an integer for the accumulator')
+    parser = argparse.ArgumentParser(description="GumnutAssembler")
+    parser.add_argument("sources", nargs="+", help="Gumnut assembler source files")
+    parser.add_argument("-o", "--out-dir", help="Directory where the output files should be placed", default=".\\")
+    # TODO: How to handle multiple input files vs. a single name argument?
+    # parser.add_argument('-n', '--name', help='Name for the assembled output files')
+
     args = parser.parse_args()
-    
+
+    for source in args.sources:
+        if args.name:
+            out_name = args.name
+        else:
+            file_name = os.path.basename(source)
+            out_name, file_ext = os.path.splitext(file_name)
+
+        datafile = os.path.join(args.out_dir, out_name + "_data.dat")
+        textfile = os.path.join(args.out_dir, out_name + "_text.dat")
+
+        gass = GumnutAssembler()
+        gass.load_asm_source_from_file(source)
+        gass.assemble()
+        gass.create_output_files(datafile, textfile)
+
+
+if __name__ == "__main__":
+    main()
