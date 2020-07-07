@@ -5,7 +5,7 @@ from collections import OrderedDict
 import re
 import os
 import logging
-
+import json
 import GumnutExceptions
 
 logger = logging.getLogger("root")
@@ -860,24 +860,32 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="GumnutAssembler")
-    parser.add_argument("sources", nargs="+", help="Gumnut assembler source files")
+    parser.add_argument("source", help="Gumnut assembler source files")
     parser.add_argument("-o", "--out-dir", help="Directory where the output files should be placed", default=".\\")
-    # TODO: How to handle multiple input files vs. a single name argument?
+    parser.add_argument("-j", "--json", help="Enable JSON output", action="store_true")
     # parser.add_argument('-n', '--name', help='Name for the assembled output files')
 
     args = parser.parse_args()
 
-    for source in args.sources:
-        file_name = os.path.basename(source)
-        out_name, file_ext = os.path.splitext(file_name)
+    file_name = os.path.basename(args.source)
+    out_name, file_ext = os.path.splitext(file_name)
 
-        datafile = os.path.join(args.out_dir, out_name + "_data.dat")
-        textfile = os.path.join(args.out_dir, out_name + "_text.dat")
+    datafile = os.path.join(args.out_dir, out_name + "_data.dat")
+    textfile = os.path.join(args.out_dir, out_name + "_text.dat")
 
-        gass = GumnutAssembler()
-        gass.load_asm_source_from_file(source)
-        gass.assemble()
+    gass = GumnutAssembler()
+    gass.load_asm_source_from_file(args.source)
+    gass.assemble()
+
+    if args.json:
+        return_data = {}
+        return_data["text"] = gass.get_instruction_memory()
+        return_data["data"] = gass.get_data_memory()
+        print(json.dumps(return_data))
+        return 0
+    else:
         gass.create_output_files(datafile, textfile)
+        return 0
 
 
 if __name__ == "__main__":
