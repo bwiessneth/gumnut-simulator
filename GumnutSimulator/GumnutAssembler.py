@@ -1,4 +1,6 @@
-__author__ = "BW"
+__version__ = "0.1.0"
+__author__ = "Benjamin Wiessneth"
+
 
 from collections import OrderedDict
 
@@ -863,7 +865,12 @@ def main():
     parser.add_argument("source", help="Gumnut assembler source files")
     parser.add_argument("-o", "--out-dir", help="Directory where the output files should be placed", default=".\\")
     parser.add_argument("-j", "--json", help="Enable JSON output", action="store_true")
-    # parser.add_argument('-n', '--name', help='Name for the assembled output files')
+    parser.add_argument(
+        "--version",
+        action="version",
+        version="%(prog)s {}".format(__version__),
+        help="show the version number and exit",
+    )
 
     args = parser.parse_args()
 
