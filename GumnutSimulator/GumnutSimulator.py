@@ -1,7 +1,5 @@
-__author__ = 'BW'
-
 from . import GumnutCore
-from . import GumnutAssembler
+from gaspy import GumnutAssembler
 from .GumnutExceptions import *
 from enum import IntEnum
 from collections import OrderedDict

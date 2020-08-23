@@ -1,5 +1,3 @@
-__author__ = 'BW'
-
 from collections import namedtuple
 from . import GumnutDecoder
 from .GumnutExceptions import *

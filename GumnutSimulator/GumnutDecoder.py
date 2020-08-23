@@ -1,5 +1,3 @@
-__author__ = 'BW'
-
 from collections import namedtuple
 
 
