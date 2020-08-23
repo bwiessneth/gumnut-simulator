@@ -1,5 +1,3 @@
-__author__ = "BW"
-
 import pytest
 from GumnutSimulator import GumnutDecoder
 

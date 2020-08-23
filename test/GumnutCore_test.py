@@ -1,5 +1,3 @@
-__author__ = "BW"
-
 import random
 import pytest
 
