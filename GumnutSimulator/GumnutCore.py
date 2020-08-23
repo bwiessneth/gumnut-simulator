@@ -1,6 +1,5 @@
-from collections import namedtuple
 from . import GumnutDecoder
-from .GumnutExceptions import *
+from . import GumnutExceptions
 
 
 class GumnutCore:
@@ -68,7 +67,7 @@ class GumnutCore:
     def upload_instruction_memory(self, data):
         """Upload the instruction memory content as a list to the core"""
         if len(data) > self.instruction_memory_size:
-            raise InstructionMemorySizeExceeded(
+            raise GumnutExceptions.InstructionMemorySizeExceeded(
                 len(data), 'Instruction memory size exceeded')
         else:
             self.instruction_memory = data
@@ -76,7 +75,7 @@ class GumnutCore:
     def upload_data_memory(self, data):
         """Upload the data memory content as a list to the core"""
         if len(data) > self.data_memory_size:
-            raise DataMemorySizeExceeded(
+            raise GumnutExceptions.DataMemorySizeExceeded(
                 len(data), 'Data memory size exceeded')
         else:
             self.data_memory = data
@@ -84,9 +83,9 @@ class GumnutCore:
     def fetch(self):
         """Fetch the next instruction to execute from program memory"""
         if self.PC >= self.instruction_memory_size:
-            raise InvalidPCValue("PC exceeds maximum value", self.PC)
+            raise GumnutExceptions.InvalidPCValue("PC exceeds maximum value", self.PC)
         elif self.PC < 0:
-            raise InvalidPCValue("PC exceeds minimum value", self.PC)
+            raise GumnutExceptions.InvalidPCValue("PC exceeds minimum value", self.PC)
         else:
             return self.instruction_memory[self.PC]
 
@@ -195,28 +194,28 @@ class GumnutCore:
 
             # Branch instructions
             elif instruction.instruction == "bz":
-                if self.ZERO == True:
+                if self.ZERO:
                     if (op2 & (0x80)):
                         self.PC = (self.PC + (op2 - 0xFF) - 1)
                     else:
                         self.PC = (self.PC + op2)
 
             elif instruction.instruction == "bnz":
-                if self.ZERO == False:
+                if not self.ZERO:
                     if (op2 & (0x80)):
                         self.PC = (self.PC + (op2 - 0xFF) - 1)
                     else:
                         self.PC = (self.PC + op2)
 
             elif instruction.instruction == "bc":
-                if self.CARRY == True:
+                if self.CARRY:
                     if (op2 & (0x80)):
                         self.PC = (self.PC + (op2 - 0xFF) - 1)
                     else:
                         self.PC = (self.PC + op2)
 
             elif instruction.instruction == "bnc":
-                if self.CARRY == False:
+                if not self.CARRY:
                     if (op2 & (0x80)):
                         self.PC = (self.PC + (op2 - 0xFF) - 1)
                     else:
@@ -241,7 +240,7 @@ class GumnutCore:
                     if (len(self.return_address_stack) < 8):
                         self.return_address_stack.insert(0, 0)
                 except IndexError:
-                    raise EmptyReturnStack(
+                    raise GumnutExceptions.EmptyReturnStack(
                         instruction.instruction, "Attempting to 'ret' while the return-address stack was empty.")
 
             elif instruction.instruction == "reti":
@@ -265,25 +264,25 @@ class GumnutCore:
 
             # Catch any unknown instructions
             else:
-                raise InvalidInstruction(
+                raise GumnutExceptions.InvalidInstruction(
                     instruction.instruction, "Unknown instruction")
         else:
-            raise InvalidInstruction("", "Empty instruction")
+            raise GumnutExceptions.InvalidInstruction("", "Empty instruction")
         return
 
     def update_PC(self):
         """Update the PC by adding 1"""
         self.PC += 1
         if self.PC >= self.instruction_memory_size:
-            raise InvalidPCValue("PC exceeds maximum value", self.PC)
+            raise GumnutExceptions.InvalidPCValue("PC exceeds maximum value", self.PC)
         elif self.PC < 0:
-            raise InvalidPCValue("PC exceeds minimum value", self.PC)
+            raise GumnutExceptions.InvalidPCValue("PC exceeds minimum value", self.PC)
         else:
             return
 
     def step(self):
         """Perform a single step"""
-        if (self.IREN == True and self.IR == True):
+        if (self.IREN and self.IR):
             self.IREN = False
             self.WAIT = False
             self.STBY = False
@@ -318,5 +317,5 @@ class GumnutCore:
     def check_data_memory_access(self, address):
         self.data_memory_access_addr = address
         if address > self.data_memory_size:
-            raise DataMemoryAccessViolation(
+            raise GumnutExceptions.DataMemoryAccessViolation(
                 address, 'Address exceeds maximum value')
