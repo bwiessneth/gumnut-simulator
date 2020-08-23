@@ -1,12 +1,20 @@
 from . import GumnutCore
 from gaspy import GumnutAssembler
-from .GumnutExceptions import *
+from . import GumnutExceptions
 from enum import IntEnum
 from collections import OrderedDict
 import json
 
 import logging
-logger = logging.getLogger('root')
+
+logger = logging.getLogger("root")
+
+
+class SimulatorState(IntEnum):
+    halt = 0
+    idle = 1
+    breakpoint = 2
+
 
 class GumnutSimulator:
     def __init__(self):
@@ -24,7 +32,6 @@ class GumnutSimulator:
         self.debug_symbols = OrderedDict()
         self.previous_PC = -1
 
-
     def reset(self):
         """Reset the Simulator and the CPU"""
         self.CPU.reset()
@@ -39,36 +46,34 @@ class GumnutSimulator:
         self.debug_symbols = OrderedDict()
         self.previous_PC = -1
 
-
     def setup(self, source):
         """Initialize the CPU"""
         self.reset()
         try:
-            assembler = GumnutAssembler.GumnutAssembler() # Create as a persistent member or only when needed here?
+            assembler = GumnutAssembler.GumnutAssembler()  # Create as a persistent member or only when needed here?
             assembler.load_asm_source(source)
             assembler.assemble()
 
             self.asm_source = source
             self.lsom_map = assembler.source_objectcode_map
             self.lines_of_code = assembler.ASMLineCount
-            self.number_of_instructions = assembler.InstrCount/2
+            self.number_of_instructions = assembler.InstrCount / 2
 
             self.CPU.upload_data_memory(assembler.get_data_memory())
             self.CPU.upload_instruction_memory(assembler.get_instruction_memory())
 
-            if (self.number_of_instructions > 0):
+            if self.number_of_instructions > 0:
                 self.state = SimulatorState.idle
             else:
                 self.state = SimulatorState.halt
 
             self.debug_symbols = assembler.source_objectcode_map
 
-        except (InvalidInstruction, InstructionMemorySizeExceeded) as e:
+        except (GumnutExceptions.InvalidInstruction, GumnutExceptions.InstructionMemorySizeExceeded) as e:
             self.exception = e
             self.state = SimulatorState.halt
         else:
             return True
-
 
     def step(self):
         """Triggers a single step of the CPU"""
@@ -79,17 +84,16 @@ class GumnutSimulator:
                 self.state = SimulatorState.breakpoint
             else:
                 self.state = SimulatorState.idle
-        except (InvalidInstruction, EmptyReturnStack) as e:
+        except (GumnutExceptions.InvalidInstruction, GumnutExceptions.EmptyReturnStack) as e:
             self.exception = e
             self.state = SimulatorState.halt
             return False
-        except ReturnAddressStackOverflow as e:
+        except GumnutExceptions.ReturnAddressStackOverflow as e:
             self.exception = e
             self.state = SimulatorState.breakpoint
             return True
         else:
             return True
-
 
     def get_flags(self):
         """
@@ -99,61 +103,62 @@ class GumnutSimulator:
         """
 
         result = dict()
-        result.update({'CARRY' : self.CPU.CARRY})
-        result.update({'ZERO' : self.CPU.ZERO})
-        result.update({'WAIT' : self.CPU.WAIT})
-        result.update({'STBY' : self.CPU.STBY})
-        result.update({'IREN' : self.CPU.IREN})
+        result.update({"CARRY": self.CPU.CARRY})
+        result.update({"ZERO": self.CPU.ZERO})
+        result.update({"WAIT": self.CPU.WAIT})
+        result.update({"STBY": self.CPU.STBY})
+        result.update({"IREN": self.CPU.IREN})
         return result
-
 
     def get_register(self):
         """
         Return CPU register as a dict
 
-        :return: ``{'r0': '0x00', 'r1': '0x00', ... , 'r7': '0x00', 'PC': '0x00', 'SP': '0x00', 'RAS': ['F8', 'F4', 'B5', 'F7', 'C1' ]}``"""
+        :return: ``{'r0': '0x00', 'r1': '0x00', ... , 'r7': '0x00',
+                    'PC': '0x00', 'SP': '0x00', 'RAS': ['F8', 'F4', 'B5', 'F7', 'C1' ]}``"""
         result = dict()
 
-        for i in range(0,8):
+        for i in range(0, 8):
             register_name = "r" + str(i)
-            result.update({register_name : self._get_formatted_number(self.CPU.r[i], self.register_format)})
+            result.update({register_name: self._get_formatted_number(self.CPU.r[i], self.register_format)})
 
-        result.update({'PC' : self._get_formatted_number(self.CPU.PC, '#04x')})
-        result.update({'SP' : self._get_formatted_number(self.CPU.SP, '#04x')})
+        result.update({"PC": self._get_formatted_number(self.CPU.PC, "#04x")})
+        result.update({"SP": self._get_formatted_number(self.CPU.SP, "#04x")})
 
         ras = list()
-        for i in range(0,8):
+        for i in range(0, 8):
             ras.append(self._get_formatted_number(self.CPU.return_address_stack[i], "03x"))
-        result.update({'RAS' : ras})
+        result.update({"RAS": ras})
 
         return result
-
 
     def get_instruction_memory(self, offset=0, size=4096):
         """
         Return CPU instruction memory as a list
 
         :return: ``['F8', 'F4', 'B5', 'F7', 'C1', '97', ... , 'D8', 'D4', '86', '94', '9B']``"""
-        result = [self._get_formatted_number(member, self.instr_memory_format) for member in self.CPU.instruction_memory[offset:offset+size]]
+        result = [
+            self._get_formatted_number(member, self.instr_memory_format)
+            for member in self.CPU.instruction_memory[offset : offset + size]
+        ]
         return result
-
 
     def get_data_memory(self, offset=0, size=256):
         """
         Return CPU data memory as a list
 
         :return: ``['F8', 'F4', 'B5', 'F7', 'C1', '97', ... , 'D8', 'D4', '86', '94', '9B']``"""
-        result = [self._get_formatted_number(member, self.data_memory_format) for member in self.CPU.data_memory[offset:offset+size]]
+        result = [
+            self._get_formatted_number(member, self.data_memory_format)
+            for member in self.CPU.data_memory[offset : offset + size]
+        ]
         return result
-
 
     def get_IO_controller_register(self, offset=0, size=256):
         return self.CPU.IO_controller_register
 
-
     def set_IO_controller_register(self, address, value):
         self.CPU.IO_controller_register[address] = value
-
 
     def get_current_line(self):
         """
@@ -165,51 +170,47 @@ class GumnutSimulator:
                 return line_number
         return -1
 
-
     def get_simulator_data(self):
         """Return some debug/additional information"""
         result = dict()
-        result.update({'state' : self.state})
-        result.update({'lines_of_code' : self.lines_of_code})
-        result.update({'number_of_instructions' : self.number_of_instructions})
-        result.update({'current_line' : self.get_current_line()})
-        result.update({'breakpoints' : self.get_breakpoints()})
-        result.update({'data_memory_access_addr' : self.CPU.data_memory_access_addr})
-        if ( self.CPU.instruction != None and self.CPU.instruction.instruction == 'jsb' ):
-            current_ret_line = self._get_source_line_from_address( self.previous_PC + 1 )
-            result.update({'current_ret_line' : current_ret_line})
+        result.update({"state": self.state})
+        result.update({"lines_of_code": self.lines_of_code})
+        result.update({"number_of_instructions": self.number_of_instructions})
+        result.update({"current_line": self.get_current_line()})
+        result.update({"breakpoints": self.get_breakpoints()})
+        result.update({"data_memory_access_addr": self.CPU.data_memory_access_addr})
+        if self.CPU.instruction is not None and self.CPU.instruction.instruction == "jsb":
+            current_ret_line = self._get_source_line_from_address(self.previous_PC + 1)
+            result.update({"current_ret_line": current_ret_line})
 
         if self.exception:
-            result.update({'exception' : self.exception.as_dict()})
+            result.update({"exception": self.exception.as_dict()})
             self.exception = None
         return result
 
-
-    def set_number_format(self, identifier = "", number_format = "d"):
+    def set_number_format(self, identifier="", number_format="d"):
         """Set number format"""
-        if (identifier == "register"):
-            if (number_format == "d"):
-                self.register_format = 'd'
-            elif (number_format == "h"):
-                self.register_format = '#04x'
-            elif (number_format == "o"):
-                self.register_format = '#05o'
-            elif (number_format == "b"):
-                self.register_format = '#010b'
-        elif (identifier == "memory"):
-            if (number_format == "d"):
-                self.memory_format = 'd'
-            elif (number_format == "h"):
-                self.memory_format = '02x'
-            elif (number_format == "o"):
-                self.memory_format = '03o'
-            elif (number_format == "b"):
-                self.memory_format = '08b'
-
+        if identifier == "register":
+            if number_format == "d":
+                self.register_format = "d"
+            elif number_format == "h":
+                self.register_format = "#04x"
+            elif number_format == "o":
+                self.register_format = "#05o"
+            elif number_format == "b":
+                self.register_format = "#010b"
+        elif identifier == "memory":
+            if number_format == "d":
+                self.memory_format = "d"
+            elif number_format == "h":
+                self.memory_format = "02x"
+            elif number_format == "o":
+                self.memory_format = "03o"
+            elif number_format == "b":
+                self.memory_format = "08b"
 
     def _get_formatted_number(self, number, number_format):
         return format(number, number_format)
-
 
     def toggle_breakpoint(self, line_number):
         if line_number in self.breakpoints:
@@ -217,32 +218,20 @@ class GumnutSimulator:
         else:
             self.breakpoints.append(line_number)
 
-
     def get_breakpoints(self):
         return self.breakpoints
-
 
     def get_state(self):
         return self.state
 
-
     def to_JSON(self):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
-
 
     def _get_source_line_from_address(self, address):
         for line_number, field in self.debug_symbols.items():
             if field[3] == address:
-                return line_number;
+                return line_number
         return -1
-
 
     def trigger_interrupt(self):
         self.CPU.IR = True
-
-
-from enum import IntEnum
-class SimulatorState(IntEnum):
-    halt = 0
-    idle = 1
-    breakpoint = 2

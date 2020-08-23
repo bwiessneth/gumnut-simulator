@@ -1,31 +1,34 @@
 from collections import namedtuple
 
 
-INSTR = namedtuple("INSTR", 'instruction fn rd op1 op2 access')
+INSTR = namedtuple("INSTR", "instruction fn rd op1 op2 access")
 
 
 class GumnutDecoder:
-
     def __init__(self):
-        self.INSTR = INSTR('', '', '', '', '', '')
+        self.INSTR = INSTR("", "", "", "", "", "")
         self.instruction = INSTR(0, 0, 0, 0, 0, 0)
 
-        self.instruction_masks = [0x3F800,  # Misc instructions
-                                  0x3F000,  # Branch instructions
-                                  0x3E000,  # Jump instructions
-                                  # Arithmetic/Logical register access
-                                  0x3C000,
-                                  0x38000,  # Shift instructions
-                                  0x30000,  # Memory and I/O instructions
-                                  0x20000]  # Arithmetic/Logical immediate access
+        self.instruction_masks = [
+            0x3F800,  # Misc instructions
+            0x3F000,  # Branch instructions
+            0x3E000,  # Jump instructions
+            # Arithmetic/Logical register access
+            0x3C000,
+            0x38000,  # Shift instructions
+            0x30000,  # Memory and I/O instructions
+            0x20000,
+        ]  # Arithmetic/Logical immediate access
 
-        self.instructions = [0x3F000,  # Misc instructions
-                             0x3E000,  # Branch instructions
-                             0x3C000,  # Jump instructions
-                             0x38000,  # Arithmetic/Logical register access
-                             0x30000,  # Shift instructions
-                             0x20000,  # Memory and I/O instructions
-                             0x00000]  # Arithmetic/Logical immediate access
+        self.instructions = [
+            0x3F000,  # Misc instructions
+            0x3E000,  # Branch instructions
+            0x3C000,  # Jump instructions
+            0x38000,  # Arithmetic/Logical register access
+            0x30000,  # Shift instructions
+            0x20000,  # Memory and I/O instructions
+            0x00000,
+        ]  # Arithmetic/Logical immediate access
 
     def decode_instruction(self, objectcode):
         """Decode a single instruction and return extracted information"""
@@ -96,12 +99,9 @@ class GumnutDecoder:
                 break
             elif objcode_masked == self.instructions[4]:
                 fn = self._extract_bitfield(current_instruction, 3, 0)
-                rd = self._extract_bitfield(
-                    current_instruction, 3, 11)      # rd
-                op1 = self._extract_bitfield(
-                    current_instruction, 3, 8)      # rs
-                op2 = self._extract_bitfield(
-                    current_instruction, 3, 5)      # count
+                rd = self._extract_bitfield(current_instruction, 3, 11)  # rd
+                op1 = self._extract_bitfield(current_instruction, 3, 8)  # rs
+                op2 = self._extract_bitfield(current_instruction, 3, 5)  # count
                 if fn == 0:
                     instruction = "shl"
                 elif fn == 1:
@@ -113,12 +113,9 @@ class GumnutDecoder:
                 break
             elif objcode_masked == self.instructions[5]:
                 fn = self._extract_bitfield(current_instruction, 3, 14)
-                rd = self._extract_bitfield(
-                    current_instruction, 3, 11)      # rd
-                op1 = self._extract_bitfield(
-                    current_instruction, 3, 8)      # rs
-                op2 = self._extract_bitfield(
-                    current_instruction, 8)         # offset
+                rd = self._extract_bitfield(current_instruction, 3, 11)  # rd
+                op1 = self._extract_bitfield(current_instruction, 3, 8)  # rs
+                op2 = self._extract_bitfield(current_instruction, 8)  # offset
                 if fn == 0:
                     instruction = "ldm"
                 elif fn == 1:

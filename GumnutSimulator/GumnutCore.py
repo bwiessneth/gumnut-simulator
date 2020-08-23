@@ -3,7 +3,6 @@ from . import GumnutExceptions
 
 
 class GumnutCore:
-
     def __init__(self):
         self.instruction_memory_size = 4096
         self.data_memory_size = 256
@@ -67,16 +66,14 @@ class GumnutCore:
     def upload_instruction_memory(self, data):
         """Upload the instruction memory content as a list to the core"""
         if len(data) > self.instruction_memory_size:
-            raise GumnutExceptions.InstructionMemorySizeExceeded(
-                len(data), 'Instruction memory size exceeded')
+            raise GumnutExceptions.InstructionMemorySizeExceeded(len(data), "Instruction memory size exceeded")
         else:
             self.instruction_memory = data
 
     def upload_data_memory(self, data):
         """Upload the data memory content as a list to the core"""
         if len(data) > self.data_memory_size:
-            raise GumnutExceptions.DataMemorySizeExceeded(
-                len(data), 'Data memory size exceeded')
+            raise GumnutExceptions.DataMemorySizeExceeded(len(data), "Data memory size exceeded")
         else:
             self.data_memory = data
 
@@ -195,38 +192,38 @@ class GumnutCore:
             # Branch instructions
             elif instruction.instruction == "bz":
                 if self.ZERO:
-                    if (op2 & (0x80)):
-                        self.PC = (self.PC + (op2 - 0xFF) - 1)
+                    if op2 & (0x80):
+                        self.PC = self.PC + (op2 - 0xFF) - 1
                     else:
-                        self.PC = (self.PC + op2)
+                        self.PC = self.PC + op2
 
             elif instruction.instruction == "bnz":
                 if not self.ZERO:
-                    if (op2 & (0x80)):
-                        self.PC = (self.PC + (op2 - 0xFF) - 1)
+                    if op2 & (0x80):
+                        self.PC = self.PC + (op2 - 0xFF) - 1
                     else:
-                        self.PC = (self.PC + op2)
+                        self.PC = self.PC + op2
 
             elif instruction.instruction == "bc":
                 if self.CARRY:
-                    if (op2 & (0x80)):
-                        self.PC = (self.PC + (op2 - 0xFF) - 1)
+                    if op2 & (0x80):
+                        self.PC = self.PC + (op2 - 0xFF) - 1
                     else:
-                        self.PC = (self.PC + op2)
+                        self.PC = self.PC + op2
 
             elif instruction.instruction == "bnc":
                 if not self.CARRY:
-                    if (op2 & (0x80)):
-                        self.PC = (self.PC + (op2 - 0xFF) - 1)
+                    if op2 & (0x80):
+                        self.PC = self.PC + (op2 - 0xFF) - 1
                     else:
-                        self.PC = (self.PC + op2)
+                        self.PC = self.PC + op2
 
             # Jump instructions
             elif instruction.instruction == "jmp":
                 self.PC = op2 - 1
 
             elif instruction.instruction == "jsb":
-                if (len(self.return_address_stack) >= 8):
+                if len(self.return_address_stack) >= 8:
                     self.return_address_stack.pop(0)
                 self.return_address_stack.append(self.PC)
                 self.SP += 1
@@ -237,11 +234,12 @@ class GumnutCore:
                 self.SP -= 1
                 try:
                     self.PC = self.return_address_stack.pop()
-                    if (len(self.return_address_stack) < 8):
+                    if len(self.return_address_stack) < 8:
                         self.return_address_stack.insert(0, 0)
                 except IndexError:
                     raise GumnutExceptions.EmptyReturnStack(
-                        instruction.instruction, "Attempting to 'ret' while the return-address stack was empty.")
+                        instruction.instruction, "Attempting to 'ret' while the return-address stack was empty."
+                    )
 
             elif instruction.instruction == "reti":
                 self.PC = self._PC - 1
@@ -264,8 +262,7 @@ class GumnutCore:
 
             # Catch any unknown instructions
             else:
-                raise GumnutExceptions.InvalidInstruction(
-                    instruction.instruction, "Unknown instruction")
+                raise GumnutExceptions.InvalidInstruction(instruction.instruction, "Unknown instruction")
         else:
             raise GumnutExceptions.InvalidInstruction("", "Empty instruction")
         return
@@ -282,7 +279,7 @@ class GumnutCore:
 
     def step(self):
         """Perform a single step"""
-        if (self.IREN and self.IR):
+        if self.IREN and self.IR:
             self.IREN = False
             self.WAIT = False
             self.STBY = False
@@ -290,7 +287,7 @@ class GumnutCore:
             self._CARRY = self.CARRY
             self._ZERO = self.ZERO
             self.PC = 1
-        elif (self.STBY == False and self.WAIT == False):
+        elif not self.STBY and not self.WAIT:
             objectcode = self.fetch()
             self.instruction = self.decoder.decode_instruction(objectcode)
             self.execute(self.instruction)
@@ -317,5 +314,4 @@ class GumnutCore:
     def check_data_memory_access(self, address):
         self.data_memory_access_addr = address
         if address > self.data_memory_size:
-            raise GumnutExceptions.DataMemoryAccessViolation(
-                address, 'Address exceeds maximum value')
+            raise GumnutExceptions.DataMemoryAccessViolation(address, "Address exceeds maximum value")
