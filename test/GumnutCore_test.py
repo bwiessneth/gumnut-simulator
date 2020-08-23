@@ -223,72 +223,197 @@ def test_subc_instruction(gcore):
 
 
 def test_and_instruction(gcore):
-    # r1 = 0
-    # r2 = 0
-    # r3 = 0
-    assert gcore.r[1] == 0
-    assert gcore.r[2] == 0
-    assert gcore.r[3] == 0
-    assert not gcore.CARRY
-    assert not gcore.ZERO
-
-    # r1 = 1
-    instr = INSTR("add", 0, 1, 1, 1, "immediate")
+    # r2 = (r1 & 1)
+    gcore.r[1] = 0
+    instr = INSTR("and", None, 2, 1, 1, "immediate")
     gcore.execute(instr)
-    assert gcore.r[1] == 1
     assert gcore.r[2] == 0
     assert not gcore.CARRY
-    assert not gcore.ZERO
+    assert gcore.ZERO
 
-    # r2 = 1
-    instr = INSTR("add", 0, 2, 2, 1, "immediate")
+    gcore.r[1] = 1
+    instr = INSTR("and", None, 2, 1, 1, "immediate")
     gcore.execute(instr)
-    assert gcore.r[1] == 1
     assert gcore.r[2] == 1
     assert not gcore.CARRY
     assert not gcore.ZERO
 
-    # r3 = (r1 & r2) = 1
+    # r3 = (r1 & r2)
+    gcore.r[1] = 0
+    gcore.r[2] = 0
+    gcore.r[3] = 0
     instr = INSTR("and", 0, 3, 1, 2, "register")
     gcore.execute(instr)
-    assert gcore.r[1] == 1
-    assert gcore.r[2] == 1
+    assert gcore.r[3] == 0
+    assert not gcore.CARRY
+    assert gcore.ZERO
+
+    gcore.r[1] = 1
+    gcore.r[2] = 0
+    gcore.r[3] = 0
+    instr = INSTR("and", 0, 3, 1, 2, "register")
+    gcore.execute(instr)
+    assert gcore.r[3] == 0
+    assert not gcore.CARRY
+    assert gcore.ZERO
+
+    gcore.r[1] = 1
+    gcore.r[2] = 1
+    gcore.r[3] = 0
+    instr = INSTR("and", 0, 3, 1, 2, "register")
+    gcore.execute(instr)
     assert gcore.r[3] == 1
     assert not gcore.CARRY
     assert not gcore.ZERO
 
 
 def test_or_instruction(gcore):
-    # r1 = 0
-    # r2 = 0
-    # r3 = 0
-    assert gcore.r[1] == 0
-    assert gcore.r[2] == 0
-    assert gcore.r[3] == 0
-    assert not gcore.CARRY
-    assert not gcore.ZERO
-
-    # r1 = 1
-    instr = INSTR("add", 0, 1, 1, 1, "immediate")
+    # r2 = (r1 OR 1)
+    gcore.r[1] = 0
+    gcore.r[2] = 0
+    instr = INSTR("or", None, 2, 1, 1, "immediate")
     gcore.execute(instr)
-    assert gcore.r[1] == 1
-    assert gcore.r[2] == 0
-    assert not gcore.CARRY
-    assert not gcore.ZERO
-
-    # r2 = 1
-    instr = INSTR("add", 0, 2, 2, 1, "immediate")
-    gcore.execute(instr)
-    assert gcore.r[1] == 1
     assert gcore.r[2] == 1
     assert not gcore.CARRY
     assert not gcore.ZERO
 
-    # r3 = (r1 & r2) = 1
+    # r2 = (r1 OR 1)
+    gcore.r[1] = 1
+    gcore.r[2] = 0
+    instr = INSTR("or", None, 2, 1, 1, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 1
+    assert not gcore.CARRY
+    assert not gcore.ZERO
+
+    # r2 = (r1 OR 0)
+    gcore.r[1] = 0
+    gcore.r[2] = 0
+    instr = INSTR("or", None, 2, 1, 0, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 0
+    assert not gcore.CARRY
+    assert gcore.ZERO
+
+    # r2 = (r1 OR 0)
+    gcore.r[1] = 1
+    gcore.r[2] = 0
+    instr = INSTR("or", None, 2, 1, 0, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 1
+    assert not gcore.CARRY
+    assert not gcore.ZERO
+
+
+    # r3 = (r1 OR r2)
+    gcore.r[1] = 0
+    gcore.r[2] = 0
+    gcore.r[3] = 0
     instr = INSTR("or", 0, 3, 1, 2, "register")
     gcore.execute(instr)
-    assert gcore.r[1] == 1
-    assert gcore.r[2] == 1
+    assert gcore.r[3] == 0
+    assert not gcore.CARRY
+    assert gcore.ZERO
+
+    gcore.r[1] = 1
+    gcore.r[2] = 0
+    gcore.r[3] = 0
+    instr = INSTR("or", 0, 3, 1, 2, "register")
+    gcore.execute(instr)
     assert gcore.r[3] == 1
     assert not gcore.CARRY
     assert not gcore.ZERO
+
+    gcore.r[1] = 0
+    gcore.r[2] = 1
+    gcore.r[3] = 0
+    instr = INSTR("or", 0, 3, 1, 2, "register")
+    gcore.execute(instr)
+    assert gcore.r[3] == 1
+    assert not gcore.CARRY
+    assert not gcore.ZERO
+
+    gcore.r[1] = 1
+    gcore.r[2] = 1
+    gcore.r[3] = 0
+    instr = INSTR("or", 0, 3, 1, 2, "register")
+    gcore.execute(instr)
+    assert gcore.r[3] == 1
+    assert not gcore.CARRY
+    assert not gcore.ZERO
+
+
+def test_xor_instruction(gcore):
+    # r2 = (r1 XOR 1)
+    gcore.r[1] = 0
+    gcore.r[2] = 0
+    instr = INSTR("xor", None, 2, 1, 1, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 1
+    assert not gcore.CARRY
+    assert not gcore.ZERO
+
+    # r2 = (r1 XOR 1)
+    gcore.r[1] = 1
+    gcore.r[2] = 0
+    instr = INSTR("xor", None, 2, 1, 1, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 0
+    assert not gcore.CARRY
+    assert gcore.ZERO
+
+    # r2 = (r1 XOR 0)
+    gcore.r[1] = 0
+    gcore.r[2] = 0
+    instr = INSTR("xor", None, 2, 1, 0, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 0
+    assert not gcore.CARRY
+    assert gcore.ZERO
+
+    # r2 = (r1 XOR 0)
+    gcore.r[1] = 1
+    gcore.r[2] = 0
+    instr = INSTR("xor", None, 2, 1, 0, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 1
+    assert not gcore.CARRY
+    assert not gcore.ZERO
+
+
+    # r3 = (r1 XOR r2)
+    gcore.r[1] = 0
+    gcore.r[2] = 0
+    gcore.r[3] = 0
+    instr = INSTR("xor", 0, 3, 1, 2, "register")
+    gcore.execute(instr)
+    assert gcore.r[3] == 0
+    assert not gcore.CARRY
+    assert gcore.ZERO
+
+    gcore.r[1] = 1
+    gcore.r[2] = 0
+    gcore.r[3] = 0
+    instr = INSTR("xor", 0, 3, 1, 2, "register")
+    gcore.execute(instr)
+    assert gcore.r[3] == 1
+    assert not gcore.CARRY
+    assert not gcore.ZERO
+
+    gcore.r[1] = 0
+    gcore.r[2] = 1
+    gcore.r[3] = 0
+    instr = INSTR("xor", 0, 3, 1, 2, "register")
+    gcore.execute(instr)
+    assert gcore.r[3] == 1
+    assert not gcore.CARRY
+    assert not gcore.ZERO
+
+    gcore.r[1] = 1
+    gcore.r[2] = 1
+    gcore.r[3] = 0
+    instr = INSTR("xor", 0, 3, 1, 2, "register")
+    gcore.execute(instr)
+    assert gcore.r[3] == 0
+    assert not gcore.CARRY
+    assert gcore.ZERO
