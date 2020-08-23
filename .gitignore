@@ -20,3 +20,11 @@ cover/
 
 # Assembler output dir
 asm_output
+
+# Build
+build/
+dist/
+*.egg-info/
+
+# Sphinx documentation
+docs/_build/
