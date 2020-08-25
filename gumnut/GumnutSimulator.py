@@ -1,6 +1,6 @@
-from . import GumnutCore
+from GumnutCore import GumnutCore
+from gumnut import GumnutExceptions
 from gaspy import GumnutAssembler
-from . import GumnutExceptions
 from enum import IntEnum
 from collections import OrderedDict
 import json
@@ -18,7 +18,7 @@ class SimulatorState(IntEnum):
 
 class GumnutSimulator:
     def __init__(self):
-        self.CPU = GumnutCore.GumnutCore()
+        self.CPU = GumnutCore()
         self.lsom_map = dict()
         self.lines_of_code = 0
         self.number_of_instructions = 0
@@ -235,3 +235,8 @@ class GumnutSimulator:
 
     def trigger_interrupt(self):
         self.CPU.IR = True
+
+
+if __name__ == '__main__':
+    gsim = GumnutSimulator()
+    print(gsim)

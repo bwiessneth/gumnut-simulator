@@ -1,5 +1,5 @@
-from . import GumnutDecoder
-from . import GumnutExceptions
+from gumnut.GumnutDecoder import GumnutDecoder
+from gumnut import GumnutExceptions
 
 
 class GumnutCore:
@@ -25,7 +25,7 @@ class GumnutCore:
         self._ZERO = 0
         self.reset()
         self.instruction = None
-        self.decoder = GumnutDecoder.GumnutDecoder()
+        self.decoder = GumnutDecoder()
         self.data_memory_access_addr = -1
         self.current_ret_line = -1
 
