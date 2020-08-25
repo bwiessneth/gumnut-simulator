@@ -1,5 +1,5 @@
 import pytest
-from GumnutSimulator import GumnutDecoder
+from gumnut import GumnutDecoder
 
 
 @pytest.fixture

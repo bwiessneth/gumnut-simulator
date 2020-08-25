@@ -1,14 +1,14 @@
 import random
 import pytest
 
-from GumnutSimulator import GumnutCore  # noqa: E402
-from GumnutSimulator import GumnutExceptions  # noqa: E402
-from GumnutSimulator.GumnutDecoder import INSTR
+from gumnut.GumnutCore import GumnutCore  # noqa: E402
+from gumnut import GumnutExceptions  # noqa: E402
+from gumnut.GumnutDecoder import INSTR
 
 
 @pytest.fixture
 def gcore():
-    return GumnutCore.GumnutCore()
+    return GumnutCore()
 
 
 def test_fetch_limits(gcore):
