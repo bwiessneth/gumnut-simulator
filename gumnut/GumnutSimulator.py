@@ -1,4 +1,4 @@
-from GumnutCore import GumnutCore
+from gumnut.GumnutCore import GumnutCore
 from gumnut import GumnutExceptions
 from gaspy import GumnutAssembler
 from enum import IntEnum
@@ -237,6 +237,11 @@ class GumnutSimulator:
         self.CPU.IR = True
 
 
-if __name__ == '__main__':
+def main():
     gsim = GumnutSimulator()
     print(gsim)
+
+
+if __name__ == '__main__':
+    main()
+
