@@ -24,7 +24,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="GumnutSimulator",
-    version=get_version("GumnutSimulator/__init__.py"),
+    version=get_version("gumnut/__init__.py"),
     author="Benjamin Wiessneth",
     author_email="b.wiessneth@gmail.com",
     description="Gumnut Simulator written in Python",
@@ -38,5 +38,5 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires=">=3.6",
-    entry_points={"console_scripts": ["gsim = GumnutSimulator.GumnutSimulator:main"]},
+    entry_points={"console_scripts": ["gumnut = gumnut.GumnutSimulator:main"]},
 )
