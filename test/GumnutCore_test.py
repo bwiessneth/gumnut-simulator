@@ -253,7 +253,7 @@ def test_and_immediate_instruction(gcore):
     gcore.execute(instr)
     assert gcore.r[2] == 1
     assert not gcore.CARRY
-    assert not gcore.ZERO    
+    assert not gcore.ZERO
 
 
 def test_and_register_instruction(gcore):
@@ -456,3 +456,169 @@ def test_xor_register_instruction(gcore):
     assert gcore.r[3] == 0
     assert not gcore.CARRY
     assert gcore.ZERO
+
+
+def test_shl_instruction(gcore):
+    # r2 = r1(1) << 1
+    gcore.r[1] = 1
+    gcore.r[2] = 0
+    instr = INSTR("shl", None, 2, 1, 1, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 2
+
+    instr = INSTR("shl", None, 2, 1, 2, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 4
+
+    instr = INSTR("shl", None, 2, 1, 3, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 8
+
+    instr = INSTR("shl", None, 2, 1, 4, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 16
+
+    instr = INSTR("shl", None, 2, 1, 5, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 32
+
+    instr = INSTR("shl", None, 2, 1, 6, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 64
+
+    instr = INSTR("shl", None, 2, 1, 7, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 128
+
+    instr = INSTR("shl", None, 2, 1, 8, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 0
+
+    instr = INSTR("shl", None, 2, 1, 9, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 0
+
+
+def test_shr_instruction(gcore):
+    # r2 = r1(128) >> 1
+    gcore.r[1] = 128
+    gcore.r[2] = 0
+    instr = INSTR("shr", None, 2, 1, 1, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 64
+
+    instr = INSTR("shr", None, 2, 1, 2, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 32
+
+    instr = INSTR("shr", None, 2, 1, 3, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 16
+
+    instr = INSTR("shr", None, 2, 1, 4, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 8
+
+    instr = INSTR("shr", None, 2, 1, 5, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 4
+
+    instr = INSTR("shr", None, 2, 1, 6, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 2
+
+    instr = INSTR("shr", None, 2, 1, 7, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 1
+
+    instr = INSTR("shr", None, 2, 1, 8, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 0
+
+    instr = INSTR("shr", None, 2, 1, 9, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 0
+
+
+def test_rol_instruction(gcore):
+    pass
+    return
+    gcore.r[1] = 1
+    gcore.r[2] = 0
+    instr = INSTR("rol", None, 2, 1, 1, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 2
+
+    instr = INSTR("rol", None, 2, 1, 2, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 4
+
+    instr = INSTR("rol", None, 2, 1, 3, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 8
+
+    instr = INSTR("rol", None, 2, 1, 4, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 16
+
+    instr = INSTR("rol", None, 2, 1, 5, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 32
+
+    instr = INSTR("rol", None, 2, 1, 6, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 64
+
+    instr = INSTR("rol", None, 2, 1, 7, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 128
+
+    instr = INSTR("rol", None, 2, 1, 8, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 1
+
+    instr = INSTR("rol", None, 2, 1, 9, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 2
+
+
+def test_ror_instruction(gcore):
+    pass
+    return
+    gcore.r[1] = 128
+    gcore.r[2] = 0
+    instr = INSTR("ror", None, 2, 1, 1, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 64
+
+    instr = INSTR("ror", None, 2, 1, 2, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 32
+
+    instr = INSTR("ror", None, 2, 1, 3, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 16
+
+    instr = INSTR("ror", None, 2, 1, 4, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 8
+
+    instr = INSTR("ror", None, 2, 1, 5, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 4
+
+    instr = INSTR("ror", None, 2, 1, 6, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 2
+
+    instr = INSTR("ror", None, 2, 1, 7, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 1
+
+    instr = INSTR("ror", None, 2, 1, 8, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 0
+
+    instr = INSTR("ror", None, 2, 1, 9, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[2] == 0
