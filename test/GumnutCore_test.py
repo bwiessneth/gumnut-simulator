@@ -15,16 +15,20 @@ def test_fetch_limits(gcore):
     gcore.PC = 0
     gcore.fetch()
 
-    with pytest.raises(GumnutExceptions.InvalidPCValue):
+    with pytest.raises(GumnutExceptions.InvalidPCValue) as e:
         gcore.PC = -1
         gcore.fetch()
+    print(e.__repr__())
+    print(e.value.as_dict())
 
     gcore.PC = 4095
     gcore.fetch()
 
-    with pytest.raises(GumnutExceptions.InvalidPCValue):
+    with pytest.raises(GumnutExceptions.InvalidPCValue) as e:
         gcore.PC = 4096
         gcore.fetch()
+    print(e.__repr__())
+    print(e.value.as_dict())
 
 
 def test_update_PC(gcore):
@@ -45,12 +49,16 @@ def test_update_PC_limits(gcore):
     gcore.update_PC()
     assert gcore.PC == 4095
 
-    with pytest.raises(GumnutExceptions.InvalidPCValue):
+    with pytest.raises(GumnutExceptions.InvalidPCValue) as e:
         gcore.update_PC()  # PC = 4096 --> Exception must be raised
+    print(e.__repr__())
+    print(e.value.as_dict())
 
     gcore.PC = -100
-    with pytest.raises(GumnutExceptions.InvalidPCValue):
+    with pytest.raises(GumnutExceptions.InvalidPCValue) as e:
         gcore.update_PC()
+    print(e.__repr__())
+    print(e.value.as_dict())
 
 
 def test_upload_instruction_memory(gcore):
@@ -60,8 +68,10 @@ def test_upload_instruction_memory(gcore):
 
 def test_upload_instruction_memory_size_exceeded(gcore):
     test_data = [int(1000 * random.random()) for i in range(4097)]
-    with pytest.raises(GumnutExceptions.InstructionMemorySizeExceeded):
+    with pytest.raises(GumnutExceptions.InstructionMemorySizeExceeded) as e:
         gcore.upload_instruction_memory(test_data)
+    print(e.__repr__())
+    print(e.value.as_dict())
 
 
 def test_upload_data_memory(gcore):
@@ -71,8 +81,10 @@ def test_upload_data_memory(gcore):
 
 def test_upload_data_memory_size_exceeded(gcore):
     test_data = [int(1000 * random.random()) for i in range(257)]
-    with pytest.raises(GumnutExceptions.DataMemorySizeExceeded):
+    with pytest.raises(GumnutExceptions.DataMemorySizeExceeded) as e:
         gcore.upload_data_memory(test_data)
+    print(e.__repr__())
+    print(e.value.as_dict())
 
 
 def test_check_data_memory_access(gcore):
@@ -80,8 +92,31 @@ def test_check_data_memory_access(gcore):
 
 
 def test_check_data_memory_access_violation(gcore):
-    with pytest.raises(GumnutExceptions.DataMemoryAccessViolation):
+    with pytest.raises(GumnutExceptions.DataMemoryAccessViolation) as e:
         gcore.check_data_memory_access(gcore.data_memory_size + 1)
+    print(e.__repr__())
+    print(e.value.as_dict())
+
+
+def test_step(gcore):
+    # TODO: Extend test a bit. Currently only checking that there's no exception!
+    gcore.step()
+
+
+def test_unknown_instruction(gcore):
+    instr = INSTR("todo", 0, 1, 1, 1, "immediate")
+    with pytest.raises(GumnutExceptions.InvalidInstruction) as e:
+        gcore.execute(instr)
+    print(e.__repr__())
+    print(e.value.as_dict())
+
+
+def test_empty_instruction(gcore):
+    instr = None
+    with pytest.raises(GumnutExceptions.InvalidInstruction) as e:
+        gcore.execute(instr)
+    print(e.__repr__())
+    print(e.value.as_dict())
 
 
 def test_add_instruction(gcore):
@@ -622,3 +657,135 @@ def test_ror_instruction(gcore):
     instr = INSTR("ror", None, 2, 1, 9, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 0
+
+
+def test_ret_instructino(gcore):
+    pass
+
+
+def test_reti_instructino(gcore):
+    pass
+
+
+def test_enai_instructino(gcore):
+    assert gcore.IREN == False
+
+    instr = INSTR("enai", None, None, None, None, None)
+    gcore.execute(instr)
+    assert gcore.IREN == True
+
+    gcore.execute(instr)
+    assert gcore.IREN == True
+
+
+def test_disi_instructino(gcore):
+    gcore.IREN = True
+    assert gcore.IREN == True
+
+    instr = INSTR("disi", None, None, None, None, None)
+    gcore.execute(instr)
+    assert gcore.IREN == False
+
+    gcore.execute(instr)
+    assert gcore.IREN == False
+
+
+def test_wait_instructino(gcore):
+    assert gcore.WAIT == False
+
+    instr = INSTR("wait", None, None, None, None, None)
+    gcore.execute(instr)
+    assert gcore.WAIT == True
+
+    gcore.execute(instr)
+    assert gcore.WAIT == True
+
+
+def test_stby_instructino(gcore):
+    assert gcore.STBY == False
+
+    instr = INSTR("stby", None, None, None, None, None)
+    gcore.execute(instr)
+    assert gcore.STBY == True
+
+    gcore.execute(instr)
+    assert gcore.STBY == True
+
+
+def test_ldm_instruction(gcore):
+    # direct access
+    # rd = 2, op1 = r1, op2 = 0
+    instr = INSTR("ldm", None, 2, 1, 0, None)
+    gcore.r[1] = 0
+
+    assert gcore.r[2] == 0
+    gcore.execute(instr)
+    assert gcore.r[2] == 0
+
+    gcore.data_memory[0] = 1
+    gcore.execute(instr)
+    assert gcore.r[2] == 1
+
+    gcore.data_memory[0xAB] = 0xCD
+    gcore.r[1] = 0xAB
+    gcore.execute(instr)
+    assert gcore.r[2] == 0xCD
+
+    # offset access
+    # rd = 2, op1 = r1, op2 = 1
+    gcore.r[1] = 0xAB
+    instr = INSTR("ldm", None, 2, 1, 1, None)
+    gcore.data_memory[0xAB] = 0xCD
+    gcore.data_memory[0xAC] = 0xEF
+    gcore.data_memory[0xAD] = 0x12
+    gcore.execute(instr)
+    assert gcore.r[2] == 0xEF
+
+    instr = INSTR("ldm", None, 2, 1, 2, None)
+    gcore.execute(instr)
+    assert gcore.r[2] == 0x12
+
+
+def test_stm_instruction(gcore):
+    # direct access
+    # rd = r2, op1 = r1, op2 = 0
+    instr = INSTR("stm", None, 2, 1, 0, None)
+    gcore.r[1] = 0
+    gcore.r[2] = 0xAB
+
+    gcore.execute(instr)
+    assert gcore.data_memory[0] == 0xAB
+
+    gcore.r[1] = 10
+    gcore.r[2] = 0xCD
+
+    gcore.execute(instr)
+    assert gcore.data_memory[10] == 0xCD
+
+    # offset access
+    # rd = r2, op1 = r1, op2 = 1
+    gcore.r[1] = 0
+    gcore.r[2] = 0xEF
+    instr = INSTR("stm", None, 2, 1, 1, None)
+
+    gcore.execute(instr)
+    assert gcore.data_memory[1] == 0xEF
+
+
+def test_inp_instruction(gcore):
+    # rd = r2, op1 = r1, op2 = 0
+    instr = INSTR("inp", None, 2, 1, 0, None)
+    gcore.r[1] = 0
+    gcore.r[2] = 0
+    gcore.IO_controller_register[0] = 0xAB
+    gcore.execute(instr)
+    assert gcore.r[2] == 0xAB
+
+
+def test_out_instruction(gcore):
+    # rd = r2, op1 = r1, op2 = 0
+    instr = INSTR("out", None, 2, 1, 0, None)
+    gcore.r[1] = 0
+    gcore.r[2] = 0xAB
+    gcore.execute(instr)
+    assert gcore.IO_controller_register[0] == 0xAB
