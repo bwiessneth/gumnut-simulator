@@ -493,6 +493,74 @@ def test_xor_register_instruction(gcore):
     assert gcore.ZERO
 
 
+def test_mask_immediate_instruction(gcore):
+    # r3 = 0xFF AND NOT 0x01 == 0xFE
+    gcore.r[1] = 0xFF
+    immed = 0x01
+    gcore.r[3] = 0
+    instr = INSTR("mask", None, 3, 1, immed, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[3] == 0xFE
+
+    # r3 = 0xFF AND NOT 0x7F == 0x80
+    gcore.r[1] = 0xFF
+    immed = 0x7F
+    gcore.r[3] = 0
+    instr = INSTR("mask", None, 3, 1, immed, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[3] == 0x80
+
+    # r3 = 0xAA AND NOT 0xF0 == 0x0A
+    gcore.r[1] = 0xAA
+    immed = 0xF0
+    gcore.r[3] = 0
+    instr = INSTR("mask", None, 3, 1, immed, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[3] == 0x0A
+
+    # r3 = 0xAA AND NOT 0x0F == 0xA0
+    gcore.r[1] = 0xAA
+    immed = 0x0F
+    gcore.r[3] = 0
+    instr = INSTR("mask", None, 3, 1, immed, "immediate")
+    gcore.execute(instr)
+    assert gcore.r[3] == 0xA0
+
+
+def test_mask_register_instruction(gcore):
+    # r3 = r1(0xFF) AND NOT r2(0x01) == 0xFE
+    gcore.r[1] = 0xFF
+    gcore.r[2] = 0x01
+    gcore.r[3] = 0
+    instr = INSTR("mask", None, 3, 1, 2, "register")
+    gcore.execute(instr)
+    assert gcore.r[3] == 0xFE
+
+    # r3 = r1(0xFF) AND NOT r2(0x7F) == 0x80
+    gcore.r[1] = 0xFF
+    gcore.r[2] = 0x7F
+    gcore.r[3] = 0
+    instr = INSTR("mask", None, 3, 1, 2, "register")
+    gcore.execute(instr)
+    assert gcore.r[3] == 0x80
+
+    # r3 = r1(0xAA) AND NOT r2(0xF0) == 0x0A
+    gcore.r[1] = 0xAA
+    gcore.r[2] = 0xF0
+    gcore.r[3] = 0
+    instr = INSTR("mask", None, 3, 1, 2, "register")
+    gcore.execute(instr)
+    assert gcore.r[3] == 0x0A
+
+    # r3 = r1(0xAA) AND NOT r2(0x0F) == 0xA0
+    gcore.r[1] = 0xAA
+    gcore.r[2] = 0x0F
+    gcore.r[3] = 0
+    instr = INSTR("mask", None, 3, 1, 2, "register")
+    gcore.execute(instr)
+    assert gcore.r[3] == 0xA0
+
+
 def test_shl_instruction(gcore):
     # r2 = r1(1) << 1
     gcore.r[1] = 1
