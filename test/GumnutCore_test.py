@@ -562,171 +562,205 @@ def test_mask_register_instruction(gcore):
 
 
 def test_shl_instruction(gcore):
-    # r2 = r1(1) << 1
     gcore.r[1] = 1
     gcore.r[2] = 0
+
+    # r2 = r1(1) << 1 == 2 
     instr = INSTR("shl", None, 2, 1, 1, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 2
 
+    # r2 = r1(1) << 2 == 4 
     instr = INSTR("shl", None, 2, 1, 2, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 4
 
+    # r2 = r1(1) << 3 == 8 
     instr = INSTR("shl", None, 2, 1, 3, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 8
 
+    # r2 = r1(1) << 4 == 16 
     instr = INSTR("shl", None, 2, 1, 4, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 16
 
+    # r2 = r1(1) << 5 == 32 
     instr = INSTR("shl", None, 2, 1, 5, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 32
 
+    # r2 = r1(1) << 6 == 64 
     instr = INSTR("shl", None, 2, 1, 6, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 64
 
+    # r2 = r1(1) << 7 == 128 
     instr = INSTR("shl", None, 2, 1, 7, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 128
 
+    # r2 = r1(1) << 8 == 0 
     instr = INSTR("shl", None, 2, 1, 8, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 0
 
+    # r2 = r1(1) << 9 == 0 
     instr = INSTR("shl", None, 2, 1, 9, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 0
 
 
 def test_shr_instruction(gcore):
-    # r2 = r1(128) >> 1
     gcore.r[1] = 128
     gcore.r[2] = 0
+
+    # r2 = r1(128) >> 1 == 64
     instr = INSTR("shr", None, 2, 1, 1, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 64
 
+    # r2 = r1(128) >> 2 == 32
     instr = INSTR("shr", None, 2, 1, 2, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 32
 
+    # r2 = r1(128) >> 3 == 16
     instr = INSTR("shr", None, 2, 1, 3, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 16
 
+    # r2 = r1(128) >> 4 == 8
     instr = INSTR("shr", None, 2, 1, 4, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 8
 
+    # r2 = r1(128) >> 5 == 4
     instr = INSTR("shr", None, 2, 1, 5, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 4
 
+    # r2 = r1(128) >> 6 == 2
     instr = INSTR("shr", None, 2, 1, 6, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 2
 
+    # r2 = r1(128) >> 7 == 1
     instr = INSTR("shr", None, 2, 1, 7, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 1
 
+    # r2 = r1(128) >> 8 == 0
     instr = INSTR("shr", None, 2, 1, 8, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 0
 
+    # r2 = r1(128) >> 9 == 0
     instr = INSTR("shr", None, 2, 1, 9, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 0
 
 
 def test_rol_instruction(gcore):
-    pass
-    return
     gcore.r[1] = 1
     gcore.r[2] = 0
+
+    # r2 = r1(1) ROL 1 == 2
     instr = INSTR("rol", None, 2, 1, 1, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 2
 
+    # r2 = r1(1) ROL 2 == 4
     instr = INSTR("rol", None, 2, 1, 2, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 4
 
+    # r2 = r1(1) ROL 3 == 8
     instr = INSTR("rol", None, 2, 1, 3, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 8
 
+    # r2 = r1(1) ROL 4 == 16
     instr = INSTR("rol", None, 2, 1, 4, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 16
 
+    # r2 = r1(1) ROL 5 == 32
     instr = INSTR("rol", None, 2, 1, 5, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 32
 
+    # r2 = r1(1) ROL 6 == 64
     instr = INSTR("rol", None, 2, 1, 6, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 64
 
+    # r2 = r1(1) ROL 7 == 128
     instr = INSTR("rol", None, 2, 1, 7, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 128
 
+    # r2 = r1(1) ROL 8 == 1
     instr = INSTR("rol", None, 2, 1, 8, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 1
 
+    # r2 = r1(1) ROL 9 == 2
     instr = INSTR("rol", None, 2, 1, 9, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 2
 
 
 def test_ror_instruction(gcore):
-    pass
-    return
     gcore.r[1] = 128
     gcore.r[2] = 0
+
+    # r2 = r1(128) ROR 1 == 64
     instr = INSTR("ror", None, 2, 1, 1, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 64
 
+    # r2 = r1(128) ROR 2 == 32
     instr = INSTR("ror", None, 2, 1, 2, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 32
 
+    # r2 = r1(128) ROR 3 == 16
     instr = INSTR("ror", None, 2, 1, 3, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 16
 
+    # r2 = r1(128) ROR 4 == 8
     instr = INSTR("ror", None, 2, 1, 4, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 8
 
+    # r2 = r1(128) ROR 5 == 4
     instr = INSTR("ror", None, 2, 1, 5, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 4
 
+    # r2 = r1(128) ROR 6 == 2
     instr = INSTR("ror", None, 2, 1, 6, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 2
 
+    # r2 = r1(128) ROR 7 == 1
     instr = INSTR("ror", None, 2, 1, 7, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 1
 
+    # r2 = r1(128) ROR 8 == 128
     instr = INSTR("ror", None, 2, 1, 8, "immediate")
     gcore.execute(instr)
-    assert gcore.r[2] == 0
+    assert gcore.r[2] == 128
 
+    # r2 = r1(128) ROR 9 == 64
     instr = INSTR("ror", None, 2, 1, 9, "immediate")
     gcore.execute(instr)
-    assert gcore.r[2] == 0
+    assert gcore.r[2] == 64
 
-
+ 
 def test_ret_instructino(gcore):
     pass
 
