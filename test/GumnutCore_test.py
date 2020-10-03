@@ -761,15 +761,15 @@ def test_ror_instruction(gcore):
     assert gcore.r[2] == 64
 
  
-def test_ret_instructino(gcore):
+def test_ret_instruction(gcore):
     pass
 
 
-def test_reti_instructino(gcore):
+def test_reti_instruction(gcore):
     pass
 
 
-def test_enai_instructino(gcore):
+def test_enai_instruction(gcore):
     assert gcore.IREN == False
 
     instr = INSTR("enai", None, None, None, None, None)
@@ -780,7 +780,7 @@ def test_enai_instructino(gcore):
     assert gcore.IREN == True
 
 
-def test_disi_instructino(gcore):
+def test_disi_instruction(gcore):
     gcore.IREN = True
     assert gcore.IREN == True
 
@@ -792,7 +792,7 @@ def test_disi_instructino(gcore):
     assert gcore.IREN == False
 
 
-def test_wait_instructino(gcore):
+def test_wait_instruction(gcore):
     assert gcore.WAIT == False
 
     instr = INSTR("wait", None, None, None, None, None)
@@ -803,7 +803,7 @@ def test_wait_instructino(gcore):
     assert gcore.WAIT == True
 
 
-def test_stby_instructino(gcore):
+def test_stby_instruction(gcore):
     assert gcore.STBY == False
 
     instr = INSTR("stby", None, None, None, None, None)
