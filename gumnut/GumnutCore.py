@@ -162,7 +162,7 @@ class GumnutCore:
 
             elif instruction.instruction == "rol":
                 _rs = self.r[op1]
-                for i in range(0, op2, 1):
+                for _ in range(0, op2, 1):
                     carry = (_rs & 0x80) >> 7
                     self.r[rd] = _rs << 1
                     self.r[rd] |= carry
@@ -171,7 +171,7 @@ class GumnutCore:
 
             elif instruction.instruction == "ror":
                 _rs = self.r[op1]
-                for i in range(0, op2, 1):
+                for _ in range(0, op2, 1):
                     carry = _rs & 0x01
                     self.r[rd] = _rs >> 1
                     self.r[rd] |= carry << 7
