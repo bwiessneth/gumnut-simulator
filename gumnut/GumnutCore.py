@@ -146,9 +146,9 @@ class GumnutCore:
 
             elif instruction.instruction == "mask":
                 if instruction.access == "register":
-                    self.r[rd] = self.r[op1] and not self.r[op2]
+                    self.r[rd] = self.r[op1] & ~self.r[op2]
                 elif instruction.access == "immediate":
-                    self.r[rd] = self.r[op1] and not op2
+                    self.r[rd] = self.r[op1] & ~op2
                 self.r[rd] = self.check_range(self.r[rd])
 
             # Shift instructions
@@ -161,18 +161,22 @@ class GumnutCore:
                 self.r[rd] &= 0xFF
 
             elif instruction.instruction == "rol":
+                _rs = self.r[op1]
                 for i in range(0, op2, 1):
-                    carry = (self.r[rd] & 0x80) >> 7
-                    self.r[rd] <<= 1
+                    carry = (_rs & 0x80) >> 7
+                    self.r[rd] = _rs << 1
                     self.r[rd] |= carry
                     self.r[rd] &= 0xFF
+                    _rs = self.r[rd]
 
             elif instruction.instruction == "ror":
+                _rs = self.r[op1]
                 for i in range(0, op2, 1):
-                    carry = self.r[rd] & 0x01
-                    self.r[rd] >>= 1
+                    carry = _rs & 0x01
+                    self.r[rd] = _rs >> 1
                     self.r[rd] |= carry << 7
                     self.r[rd] &= 0xFF
+                    _rs = self.r[rd]
 
             # Memory and I/O instructions
             elif instruction.instruction == "ldm":
