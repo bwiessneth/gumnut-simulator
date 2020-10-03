@@ -565,47 +565,47 @@ def test_shl_instruction(gcore):
     gcore.r[1] = 1
     gcore.r[2] = 0
 
-    # r2 = r1(1) << 1 == 2 
+    # r2 = r1(1) << 1 == 2
     instr = INSTR("shl", None, 2, 1, 1, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 2
 
-    # r2 = r1(1) << 2 == 4 
+    # r2 = r1(1) << 2 == 4
     instr = INSTR("shl", None, 2, 1, 2, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 4
 
-    # r2 = r1(1) << 3 == 8 
+    # r2 = r1(1) << 3 == 8
     instr = INSTR("shl", None, 2, 1, 3, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 8
 
-    # r2 = r1(1) << 4 == 16 
+    # r2 = r1(1) << 4 == 16
     instr = INSTR("shl", None, 2, 1, 4, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 16
 
-    # r2 = r1(1) << 5 == 32 
+    # r2 = r1(1) << 5 == 32
     instr = INSTR("shl", None, 2, 1, 5, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 32
 
-    # r2 = r1(1) << 6 == 64 
+    # r2 = r1(1) << 6 == 64
     instr = INSTR("shl", None, 2, 1, 6, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 64
 
-    # r2 = r1(1) << 7 == 128 
+    # r2 = r1(1) << 7 == 128
     instr = INSTR("shl", None, 2, 1, 7, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 128
 
-    # r2 = r1(1) << 8 == 0 
+    # r2 = r1(1) << 8 == 0
     instr = INSTR("shl", None, 2, 1, 8, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 0
 
-    # r2 = r1(1) << 9 == 0 
+    # r2 = r1(1) << 9 == 0
     instr = INSTR("shl", None, 2, 1, 9, "immediate")
     gcore.execute(instr)
     assert gcore.r[2] == 0
@@ -760,7 +760,7 @@ def test_ror_instruction(gcore):
     gcore.execute(instr)
     assert gcore.r[2] == 64
 
- 
+
 def test_ret_instruction(gcore):
     pass
 
@@ -891,3 +891,40 @@ def test_out_instruction(gcore):
     gcore.r[2] = 0xAB
     gcore.execute(instr)
     assert gcore.IO_controller_register[0] == 0xAB
+
+
+def test_jmp_instruction(gcore):
+    gcore.PC = 128
+
+    # Jump to addr 256
+    instr = INSTR("jmp", None, None, None, 256, None)
+    gcore.execute(instr)
+    assert gcore.PC == 255
+
+
+def test_jsb_instruction(gcore):
+    gcore.SP = 0
+    gcore.PC = 128
+
+    # Jump to subroutine addr 256
+    instr = INSTR("jsb", None, None, None, 256, None)
+    gcore.execute(instr)
+    assert gcore.PC == 255
+    assert gcore.SP == 1
+    assert gcore.return_address_stack[-1] == 128
+
+
+def test_ret_instruction(gcore):
+    gcore.SP = 0
+    gcore.PC = 128
+
+    # Jump to subroutine addr 256
+    instr = INSTR("jsb", None, None, None, 256, None)
+    gcore.execute(instr)
+
+    # Return from subroutine to addr 128
+    instr = INSTR("ret", None, None, None, None, None)
+    gcore.execute(instr)
+    assert gcore.PC == 128
+    assert gcore.SP == 0
+    assert gcore.return_address_stack[-1] == 0
