@@ -1,11 +1,10 @@
-from gumnut.GumnutCore import GumnutCore
-from gumnut import GumnutExceptions
-from gaspy import GumnutAssembler
 from enum import IntEnum
 from collections import OrderedDict
 import json
-
 import logging
+from gaspy import GumnutAssembler
+from gumnut.GumnutCore import GumnutCore
+from gumnut import GumnutExceptions
 
 logger = logging.getLogger("root")
 
@@ -21,10 +20,12 @@ class GumnutSimulator:
         self.CPU = GumnutCore()
         self.lsom_map = dict()
         self.lines_of_code = 0
+        self.current_line = 0
         self.number_of_instructions = 0
         self.register_format = "#04x"
         self.instr_memory_format = "05x"
         self.data_memory_format = "02x"
+        self.memory_format = "d"
         self.breakpoints = list()
         self.exception = None
         self.state = SimulatorState.halt
@@ -154,7 +155,7 @@ class GumnutSimulator:
         ]
         return result
 
-    def get_IO_controller_register(self, offset=0, size=256):
+    def get_IO_controller_register(self):
         return self.CPU.IO_controller_register
 
     def set_IO_controller_register(self, address, value):
