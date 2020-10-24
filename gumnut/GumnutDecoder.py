@@ -4,6 +4,15 @@ from collections import namedtuple
 INSTR = namedtuple("INSTR", "instruction fn rd op1 op2 access")
 
 
+def _extract_bitfield(source, width, offset=0):
+    """Extract series or a single bit from source"""
+    mask = 0
+    for _ in range(width):
+        mask = (mask << 1) + 1
+    result = (source & mask << offset) >> offset
+    return result
+
+
 class GumnutDecoder:
     def __init__(self):
         self.INSTR = INSTR("", "", "", "", "", "")
@@ -51,10 +60,10 @@ class GumnutDecoder:
             # Check masked objectcode for instruction pattern
             # Arithmetic/Logic REGISTER
             if objcode_masked == self.instructions[3]:
-                fn = self._extract_bitfield(current_instruction, 3, 0)
-                rd = self._extract_bitfield(current_instruction, 3, 11)
-                op1 = self._extract_bitfield(current_instruction, 3, 8)
-                op2 = self._extract_bitfield(current_instruction, 3, 5)
+                fn = _extract_bitfield(current_instruction, 3, 0)
+                rd = _extract_bitfield(current_instruction, 3, 11)
+                op1 = _extract_bitfield(current_instruction, 3, 8)
+                op2 = _extract_bitfield(current_instruction, 3, 5)
                 access = "register"
                 if fn == 0:
                     instruction = "add"
@@ -73,13 +82,14 @@ class GumnutDecoder:
                 elif fn == 7:
                     instruction = "mask"
                 break
+
             # Arithmetic/Logic IMMEDIATE
-            elif objcode_masked == self.instructions[6]:
+            if objcode_masked == self.instructions[6]:
                 access = "immediate"
-                fn = self._extract_bitfield(current_instruction, 3, 14)
-                rd = self._extract_bitfield(current_instruction, 3, 11)
-                op1 = self._extract_bitfield(current_instruction, 3, 8)
-                op2 = self._extract_bitfield(current_instruction, 8)
+                fn = _extract_bitfield(current_instruction, 3, 14)
+                rd = _extract_bitfield(current_instruction, 3, 11)
+                op1 = _extract_bitfield(current_instruction, 3, 8)
+                op2 = _extract_bitfield(current_instruction, 8)
                 if fn == 0:
                     instruction = "add"
                 elif fn == 1:
@@ -97,11 +107,12 @@ class GumnutDecoder:
                 elif fn == 7:
                     instruction = "mask"
                 break
-            elif objcode_masked == self.instructions[4]:
-                fn = self._extract_bitfield(current_instruction, 3, 0)
-                rd = self._extract_bitfield(current_instruction, 3, 11)  # rd
-                op1 = self._extract_bitfield(current_instruction, 3, 8)  # rs
-                op2 = self._extract_bitfield(current_instruction, 3, 5)  # count
+
+            if objcode_masked == self.instructions[4]:
+                fn = _extract_bitfield(current_instruction, 3, 0)
+                rd = _extract_bitfield(current_instruction, 3, 11)  # rd
+                op1 = _extract_bitfield(current_instruction, 3, 8)  # rs
+                op2 = _extract_bitfield(current_instruction, 3, 5)  # count
                 if fn == 0:
                     instruction = "shl"
                 elif fn == 1:
@@ -111,11 +122,12 @@ class GumnutDecoder:
                 elif fn == 3:
                     instruction = "ror"
                 break
-            elif objcode_masked == self.instructions[5]:
-                fn = self._extract_bitfield(current_instruction, 3, 14)
-                rd = self._extract_bitfield(current_instruction, 3, 11)  # rd
-                op1 = self._extract_bitfield(current_instruction, 3, 8)  # rs
-                op2 = self._extract_bitfield(current_instruction, 8)  # offset
+
+            if objcode_masked == self.instructions[5]:
+                fn = _extract_bitfield(current_instruction, 3, 14)
+                rd = _extract_bitfield(current_instruction, 3, 11)  # rd
+                op1 = _extract_bitfield(current_instruction, 3, 8)  # rs
+                op2 = _extract_bitfield(current_instruction, 8)  # offset
                 if fn == 0:
                     instruction = "ldm"
                 elif fn == 1:
@@ -125,18 +137,20 @@ class GumnutDecoder:
                 elif fn == 3:
                     instruction = "out"
                 break
-            elif objcode_masked == self.instructions[2] and self._extract_bitfield(current_instruction, 1, 13) == 0:
-                fn = self._extract_bitfield(current_instruction, 1, 12)
+
+            if objcode_masked == self.instructions[2] and _extract_bitfield(current_instruction, 1, 13) == 0:
+                fn = _extract_bitfield(current_instruction, 1, 12)
                 rd = 0
-                op2 = self._extract_bitfield(current_instruction, 12)
+                op2 = _extract_bitfield(current_instruction, 12)
                 if fn == 0:
                     instruction = "jmp"
                 elif fn == 1:
                     instruction = "jsb"
                 break
-            elif objcode_masked == self.instructions[1]:
-                fn = self._extract_bitfield(current_instruction, 3, 10)
-                op2 = self._extract_bitfield(current_instruction, 8)
+
+            if objcode_masked == self.instructions[1]:
+                fn = _extract_bitfield(current_instruction, 3, 10)
+                op2 = _extract_bitfield(current_instruction, 8)
                 if fn == 0:
                     instruction = "bz"
                 elif fn == 1:
@@ -146,8 +160,9 @@ class GumnutDecoder:
                 elif fn == 3:
                     instruction = "bnc"
                 break
-            elif objcode_masked == self.instructions[0]:
-                fn = self._extract_bitfield(current_instruction, 3, 8)
+
+            if objcode_masked == self.instructions[0]:
+                fn = _extract_bitfield(current_instruction, 3, 8)
                 if fn == 0:
                     instruction = "ret"
                 elif fn == 1:
@@ -163,12 +178,4 @@ class GumnutDecoder:
                 break
 
         result = INSTR(instruction, fn, rd, op1, op2, access)
-        return result
-
-    def _extract_bitfield(self, source, width, offset=0):
-        """Extract series or a single bit from source"""
-        mask = 0
-        for i in range(width):
-            mask = (mask << 1) + 1
-        result = (source & mask << offset) >> offset
         return result
