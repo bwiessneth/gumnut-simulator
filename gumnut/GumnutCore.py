@@ -243,7 +243,7 @@ class GumnutCore:
                 except IndexError:
                     raise GumnutExceptions.EmptyReturnStack(
                         instruction.instruction, "Attempting to 'ret' while the return-address stack was empty."
-                    )
+                    ) from IndexError
 
             elif instruction.instruction == "reti":
                 self.PC = self._PC - 1
