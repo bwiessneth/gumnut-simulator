@@ -37,14 +37,12 @@ class InvalidPCValue(Error):
     """
 
 
-
 class InstructionMemorySizeExceeded(Error):
 
     """
     Get's raised when trying to upload more data into the instruction
     memory than it can hold.
     """
-
 
 
 class DataMemorySizeExceeded(Error):
@@ -55,7 +53,6 @@ class DataMemorySizeExceeded(Error):
     """
 
 
-
 class DataMemoryAccessViolation(Error):
 
     """
@@ -64,13 +61,11 @@ class DataMemoryAccessViolation(Error):
     """
 
 
-
 class InvalidInstruction(Error):
 
     """
     Get's raised when an unknown or invalid instruction is encountered.
     """
-
 
 
 class EmptyReturnStack(Error):
@@ -81,11 +76,9 @@ class EmptyReturnStack(Error):
     """
 
 
-
 class ReturnAddressStackOverflow(Error):
 
     """
     Get's raised when trying jump into a subroutine although the
     return address stack is already full.
     """
-
