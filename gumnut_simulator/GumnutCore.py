@@ -1,5 +1,5 @@
-from gumnut.GumnutDecoder import GumnutDecoder
-from gumnut import GumnutExceptions
+from gumnut_simulator.GumnutDecoder import GumnutDecoder
+from gumnut_simulator import GumnutExceptions
 
 
 class GumnutCore:

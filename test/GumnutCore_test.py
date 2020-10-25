@@ -1,9 +1,9 @@
 import random
 import pytest
 
-from gumnut.GumnutCore import GumnutCore  # noqa: E402
-from gumnut import GumnutExceptions  # noqa: E402
-from gumnut.GumnutDecoder import INSTR
+from gumnut_simulator.GumnutCore import GumnutCore  # noqa: E402
+from gumnut_simulator import GumnutExceptions  # noqa: E402
+from gumnut_simulator.GumnutDecoder import INSTR
 
 
 @pytest.fixture

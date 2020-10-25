@@ -24,7 +24,7 @@ with open("README.rst", "r") as fh:
 
 setuptools.setup(
     name="gumnut-simulator",
-    version=get_version("gumnut/__init__.py"),
+    version=get_version("gumnut_simulator/__init__.py"),
     author="Benjamin Wiessneth",
     author_email="b.wiessneth@gmail.com",
     description="Gumnut Simulator written in Python",
@@ -38,7 +38,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires=">=3.6",
-    entry_points={"console_scripts": ["gumnut-simulator = gumnut.GumnutSimulator:main"]},
+    entry_points={"console_scripts": ["gumnut-simulator = gumnut_simulator.GumnutSimulator:main"]},
     install_requires=['gaspy'],
     extras_require={
         'dev': [

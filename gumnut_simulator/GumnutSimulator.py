@@ -3,8 +3,8 @@ from collections import OrderedDict
 import json
 import logging
 from gaspy import GumnutAssembler
-from gumnut.GumnutCore import GumnutCore
-from gumnut import GumnutExceptions
+from gumnut_simulator.GumnutCore import GumnutCore
+from gumnut_simulator import GumnutExceptions
 
 logger = logging.getLogger("root")
 
