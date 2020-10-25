@@ -251,7 +251,7 @@ def main():
         help="show the version number and exit",
     )
 
-    args = parser.parse_args()
+    parser.parse_args()
 
     return 0
 
