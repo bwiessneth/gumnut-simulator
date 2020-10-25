@@ -239,8 +239,20 @@ class GumnutSimulator:
 
 
 def main():
-    gsim = GumnutSimulator()
-    print(gsim)
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Gumnut Simulator")
+    parser.add_argument(
+        "-v",
+        "--version",
+        action="version",
+        version="%(prog)s {}".format(__version__),
+        help="show the version number and exit",
+    )
+
+    args = parser.parse_args()
+
+    return 0
 
 
 if __name__ == "__main__":
