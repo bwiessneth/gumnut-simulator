@@ -3,6 +3,7 @@ from collections import OrderedDict
 import json
 import logging
 from gaspy import GumnutAssembler
+from gumnut_simulator import __version__
 from gumnut_simulator.GumnutCore import GumnutCore
 from gumnut_simulator import GumnutExceptions
 
