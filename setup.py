@@ -30,7 +30,7 @@ setuptools.setup(
     description="Gumnut Simulator written in Python",
     long_description=long_description,
     long_description_content_type="text/x-rst",
-    url="https://github.com/bwiessneth/gumnut_simulator",
+    url="https://github.com/bwiessneth/gumnut-simulator",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
@@ -38,7 +38,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires=">=3.6",
-    entry_points={"console_scripts": ["gumnut = gumnut.GumnutSimulator:main"]},
+    entry_points={"console_scripts": ["gumnut-simulator = gumnut.GumnutSimulator:main"]},
     install_requires=['gaspy'],
     extras_require={
         'dev': [
