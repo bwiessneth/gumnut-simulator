@@ -5,7 +5,12 @@ import logging
 from gaspy import GumnutAssembler
 from gumnut_simulator import __version__
 from gumnut_simulator.core import GumnutCore
-from gumnut_simulator import exceptions
+from gumnut_simulator.exceptions import (
+    InvalidInstruction,
+    InstructionMemorySizeExceeded,
+    EmptyReturnStack,
+    ReturnAddressStackOverflow,
+)
 
 logger = logging.getLogger("root")
 
@@ -71,7 +76,7 @@ class GumnutSimulator:
 
             self.debug_symbols = assembler.source_objectcode_map
 
-        except (GumnutExceptions.InvalidInstruction, GumnutExceptions.InstructionMemorySizeExceeded) as e:
+        except (InvalidInstruction, InstructionMemorySizeExceeded) as e:
             self.exception = e
             self.state = SimulatorState.halt
         else:
@@ -86,11 +91,11 @@ class GumnutSimulator:
                 self.state = SimulatorState.breakpoint
             else:
                 self.state = SimulatorState.idle
-        except (GumnutExceptions.InvalidInstruction, GumnutExceptions.EmptyReturnStack) as e:
+        except (InvalidInstruction, EmptyReturnStack) as e:
             self.exception = e
             self.state = SimulatorState.halt
             return False
-        except GumnutExceptions.ReturnAddressStackOverflow as e:
+        except ReturnAddressStackOverflow as e:
             self.exception = e
             self.state = SimulatorState.breakpoint
             return True

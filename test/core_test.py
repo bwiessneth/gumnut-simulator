@@ -2,7 +2,13 @@ import random
 import pytest
 
 from gumnut_simulator.core import GumnutCore  # noqa: E402
-from gumnut_simulator.exceptions import InvalidPCValue, InstructionMemorySizeExceeded, DataMemorySizeExceeded, DataMemoryAccessViolation, InvalidInstruction
+from gumnut_simulator.exceptions import (
+    InvalidPCValue,
+    InstructionMemorySizeExceeded,
+    DataMemorySizeExceeded,
+    DataMemoryAccessViolation,
+    InvalidInstruction,
+)
 from gumnut_simulator.decoder import INSTR
 
 

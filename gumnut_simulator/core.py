@@ -1,5 +1,12 @@
 from gumnut_simulator.decoder import GumnutDecoder
-from gumnut_simulator.exceptions import InvalidPCValue, InstructionMemorySizeExceeded, DataMemorySizeExceeded, DataMemoryAccessViolation, InvalidInstruction
+from gumnut_simulator.exceptions import (
+    InvalidPCValue,
+    InstructionMemorySizeExceeded,
+    DataMemorySizeExceeded,
+    DataMemoryAccessViolation,
+    InvalidInstruction,
+    EmptyReturnStack,
+)
 
 
 class GumnutCore:
