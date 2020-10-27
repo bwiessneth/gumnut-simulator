@@ -39,20 +39,20 @@ setuptools.setup(
     ],
     python_requires=">=3.6",
     entry_points={"console_scripts": ["gumnut-simulator = gumnut_simulator.GumnutSimulator:main"]},
-    install_requires=['gaspy'],
+    install_requires=["gaspy"],
     extras_require={
-        'dev': [
-            'tox',
-            'wheel',
-            'setuptools',
-            'twine',
-            'pytest',
-            'pytest-cov',
-            'flake8',
-            'pylint',
-            'black',
-            'sphinx',
-            'sphinx_rtd_theme',
+        "dev": [
+            "tox",
+            "wheel",
+            "setuptools",
+            "twine",
+            "pytest",
+            "pytest-cov",
+            "flake8",
+            "pylint",
+            "black",
+            "sphinx",
+            "sphinx_rtd_theme",
         ]
-    }
+    },
 )
