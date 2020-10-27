@@ -4,8 +4,8 @@ import json
 import logging
 from gaspy import GumnutAssembler
 from gumnut_simulator import __version__
-from gumnut_simulator.GumnutCore import GumnutCore
-from gumnut_simulator import GumnutExceptions
+from gumnut_simulator.core import GumnutCore
+from gumnut_simulator import exceptions
 
 logger = logging.getLogger("root")
 

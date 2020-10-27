@@ -1,5 +1,5 @@
-from gumnut_simulator.GumnutDecoder import GumnutDecoder
-from gumnut_simulator import GumnutExceptions
+from gumnut_simulator.decoder import GumnutDecoder
+from gumnut_simulator.exceptions import InvalidPCValue, InstructionMemorySizeExceeded, DataMemorySizeExceeded, DataMemoryAccessViolation, InvalidInstruction
 
 
 class GumnutCore:
@@ -66,23 +66,23 @@ class GumnutCore:
     def upload_instruction_memory(self, data):
         """Upload the instruction memory content as a list to the core"""
         if len(data) > self.instruction_memory_size:
-            raise GumnutExceptions.InstructionMemorySizeExceeded(len(data), "Instruction memory size exceeded")
+            raise InstructionMemorySizeExceeded(len(data), "Instruction memory size exceeded")
         else:
             self.instruction_memory = data
 
     def upload_data_memory(self, data):
         """Upload the data memory content as a list to the core"""
         if len(data) > self.data_memory_size:
-            raise GumnutExceptions.DataMemorySizeExceeded(len(data), "Data memory size exceeded")
+            raise DataMemorySizeExceeded(len(data), "Data memory size exceeded")
         else:
             self.data_memory = data
 
     def fetch(self):
         """Fetch the next instruction to execute from program memory"""
         if self.PC >= self.instruction_memory_size:
-            raise GumnutExceptions.InvalidPCValue("PC exceeds maximum value", self.PC)
+            raise InvalidPCValue("PC exceeds maximum value", self.PC)
         elif self.PC < 0:
-            raise GumnutExceptions.InvalidPCValue("PC exceeds minimum value", self.PC)
+            raise InvalidPCValue("PC exceeds minimum value", self.PC)
         else:
             return self.instruction_memory[self.PC]
 
@@ -241,7 +241,7 @@ class GumnutCore:
                     if len(self.return_address_stack) < 8:
                         self.return_address_stack.insert(0, 0)
                 except IndexError:
-                    raise GumnutExceptions.EmptyReturnStack(
+                    raise EmptyReturnStack(
                         instruction.instruction, "Attempting to 'ret' while the return-address stack was empty."
                     ) from IndexError
 
@@ -266,18 +266,18 @@ class GumnutCore:
 
             # Catch any unknown instructions
             else:
-                raise GumnutExceptions.InvalidInstruction(instruction.instruction, "Unknown instruction")
+                raise InvalidInstruction(instruction.instruction, "Unknown instruction")
         else:
-            raise GumnutExceptions.InvalidInstruction("", "Empty instruction")
+            raise InvalidInstruction("", "Empty instruction")
         return
 
     def update_PC(self):
         """Update the PC by adding 1"""
         self.PC += 1
         if self.PC >= self.instruction_memory_size:
-            raise GumnutExceptions.InvalidPCValue("PC exceeds maximum value", self.PC)
+            raise InvalidPCValue("PC exceeds maximum value", self.PC)
         elif self.PC < 0:
-            raise GumnutExceptions.InvalidPCValue("PC exceeds minimum value", self.PC)
+            raise InvalidPCValue("PC exceeds minimum value", self.PC)
         else:
             return
 
@@ -318,4 +318,4 @@ class GumnutCore:
     def check_data_memory_access(self, address):
         self.data_memory_access_addr = address
         if address > self.data_memory_size:
-            raise GumnutExceptions.DataMemoryAccessViolation(address, "Address exceeds maximum value")
+            raise DataMemoryAccessViolation(address, "Address exceeds maximum value")
