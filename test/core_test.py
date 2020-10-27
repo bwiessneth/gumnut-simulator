@@ -1,9 +1,9 @@
 import random
 import pytest
 
-from gumnut_simulator.GumnutCore import GumnutCore  # noqa: E402
-from gumnut_simulator import GumnutExceptions  # noqa: E402
-from gumnut_simulator.GumnutDecoder import INSTR
+from gumnut_simulator.core import GumnutCore  # noqa: E402
+from gumnut_simulator.exceptions import InvalidPCValue, InstructionMemorySizeExceeded, DataMemorySizeExceeded, DataMemoryAccessViolation, InvalidInstruction
+from gumnut_simulator.decoder import INSTR
 
 
 @pytest.fixture
@@ -15,7 +15,7 @@ def test_fetch_limits(gcore):
     gcore.PC = 0
     gcore.fetch()
 
-    with pytest.raises(GumnutExceptions.InvalidPCValue) as e:
+    with pytest.raises(InvalidPCValue) as e:
         gcore.PC = -1
         gcore.fetch()
     print(e.__repr__())
@@ -24,7 +24,7 @@ def test_fetch_limits(gcore):
     gcore.PC = 4095
     gcore.fetch()
 
-    with pytest.raises(GumnutExceptions.InvalidPCValue) as e:
+    with pytest.raises(InvalidPCValue) as e:
         gcore.PC = 4096
         gcore.fetch()
     print(e.__repr__())
@@ -49,13 +49,13 @@ def test_update_PC_limits(gcore):
     gcore.update_PC()
     assert gcore.PC == 4095
 
-    with pytest.raises(GumnutExceptions.InvalidPCValue) as e:
+    with pytest.raises(InvalidPCValue) as e:
         gcore.update_PC()  # PC = 4096 --> Exception must be raised
     print(e.__repr__())
     print(e.value.as_dict())
 
     gcore.PC = -100
-    with pytest.raises(GumnutExceptions.InvalidPCValue) as e:
+    with pytest.raises(InvalidPCValue) as e:
         gcore.update_PC()
     print(e.__repr__())
     print(e.value.as_dict())
@@ -68,7 +68,7 @@ def test_upload_instruction_memory(gcore):
 
 def test_upload_instruction_memory_size_exceeded(gcore):
     test_data = [int(1000 * random.random()) for i in range(4097)]
-    with pytest.raises(GumnutExceptions.InstructionMemorySizeExceeded) as e:
+    with pytest.raises(InstructionMemorySizeExceeded) as e:
         gcore.upload_instruction_memory(test_data)
     print(e.__repr__())
     print(e.value.as_dict())
@@ -81,7 +81,7 @@ def test_upload_data_memory(gcore):
 
 def test_upload_data_memory_size_exceeded(gcore):
     test_data = [int(1000 * random.random()) for i in range(257)]
-    with pytest.raises(GumnutExceptions.DataMemorySizeExceeded) as e:
+    with pytest.raises(DataMemorySizeExceeded) as e:
         gcore.upload_data_memory(test_data)
     print(e.__repr__())
     print(e.value.as_dict())
@@ -92,7 +92,7 @@ def test_check_data_memory_access(gcore):
 
 
 def test_check_data_memory_access_violation(gcore):
-    with pytest.raises(GumnutExceptions.DataMemoryAccessViolation) as e:
+    with pytest.raises(DataMemoryAccessViolation) as e:
         gcore.check_data_memory_access(gcore.data_memory_size + 1)
     print(e.__repr__())
     print(e.value.as_dict())
@@ -105,7 +105,7 @@ def test_step(gcore):
 
 def test_unknown_instruction(gcore):
     instr = INSTR("todo", 0, 1, 1, 1, "immediate")
-    with pytest.raises(GumnutExceptions.InvalidInstruction) as e:
+    with pytest.raises(InvalidInstruction) as e:
         gcore.execute(instr)
     print(e.__repr__())
     print(e.value.as_dict())
@@ -113,7 +113,7 @@ def test_unknown_instruction(gcore):
 
 def test_empty_instruction(gcore):
     instr = None
-    with pytest.raises(GumnutExceptions.InvalidInstruction) as e:
+    with pytest.raises(InvalidInstruction) as e:
         gcore.execute(instr)
     print(e.__repr__())
     print(e.value.as_dict())
