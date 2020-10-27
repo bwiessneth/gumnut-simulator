@@ -21,6 +21,15 @@ Changelog
 *********
 
 
+1.0.0
+=====
+
+Changed
+-------
+
+-  Enforced proper module names and naming convention
+
+
 
 0.0.1
 =====
