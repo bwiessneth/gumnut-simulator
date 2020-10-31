@@ -34,7 +34,11 @@ import sphinx_rtd_theme
 # ones.
 extensions = [
     'sphinx.ext.extlinks',
+    'autoapi.extension',
 ]
+
+autoapi_dirs = ['../gumnut_simulator']
+
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
