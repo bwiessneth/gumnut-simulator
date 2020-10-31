@@ -1,7 +1,6 @@
 from enum import IntEnum
 from collections import OrderedDict
 import json
-import logging
 from gaspy import GumnutAssembler
 from gumnut_simulator import __version__
 from gumnut_simulator.core import GumnutCore
@@ -12,7 +11,6 @@ from gumnut_simulator.exceptions import (
     ReturnAddressStackOverflow,
 )
 
-logger = logging.getLogger("root")
 
 
 class SimulatorState(IntEnum):
@@ -22,6 +20,9 @@ class SimulatorState(IntEnum):
 
 
 class GumnutSimulator:
+    """
+    Class which holds simulator data and CPU
+    """
     def __init__(self):
         self.CPU = GumnutCore()
         self.lsom_map = dict()
@@ -40,7 +41,7 @@ class GumnutSimulator:
         self.previous_PC = -1
 
     def reset(self):
-        """Reset the Simulator and the CPU"""
+        """Reset the simulator and the CPU"""
         self.CPU.reset()
         self.lsom_map.clear()
         self.lines_of_code = 0
@@ -162,6 +163,9 @@ class GumnutSimulator:
         return result
 
     def get_IO_controller_register(self):
+        """
+        Return IO controller register as a list
+        """
         return self.CPU.IO_controller_register
 
     def set_IO_controller_register(self, address, value):
@@ -169,8 +173,7 @@ class GumnutSimulator:
 
     def get_current_line(self):
         """
-        Return the current line number by looking up the current
-        instruction memory pointer
+        Return the current line number by looking up the current instruction memory pointer
         """
         for line_number, value in self.lsom_map.items():
             if value[3] == self.CPU.PC:
@@ -226,9 +229,15 @@ class GumnutSimulator:
             self.breakpoints.append(line_number)
 
     def get_breakpoints(self):
+        """
+        Return current breakpoints
+        """        
         return self.breakpoints
 
     def get_state(self):
+        """
+        Return current simulator state
+        """
         return self.state
 
     def to_JSON(self):
@@ -241,6 +250,9 @@ class GumnutSimulator:
         return -1
 
     def trigger_interrupt(self):
+        """
+        Triggers an CPU interrupt by setting the internal flag
+        """
         self.CPU.IR = True
 
 
