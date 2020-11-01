@@ -53,6 +53,11 @@ setuptools.setup(
             "black",
             "sphinx",
             "sphinx_rtd_theme",
+        ],
+        "docs": [
+            "sphinx",
+            "sphinx_rtd_theme",
+            "sphinx-autoapi",
         ]
     },
 )
