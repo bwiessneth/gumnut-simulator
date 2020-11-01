@@ -1,3 +1,13 @@
+.. image:: https://github.com/bwiessneth/gumnut-simulator/workflows/pytest/badge.svg
+   :target: https://github.com/bwiessneth/gumnut-simulator/actions?query=workflow%3Apytest
+   :alt: tests status
+
+.. image:: https://readthedocs.org/projects/gumnut-simulator/badge/?version=latest
+   :target: https://gumnut-simulator.readthedocs.io/en/latest/?badge=latest
+   :alt: docs status
+
+
+
 Gumnut Simulator
 ################
 
