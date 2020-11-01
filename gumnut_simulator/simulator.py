@@ -1,7 +1,7 @@
 from enum import IntEnum
 from collections import OrderedDict
 import json
-from gaspy import GumnutAssembler
+from gumnut_assembler.assembler import GumnutAssembler
 from gumnut_simulator import __version__
 from gumnut_simulator.core import GumnutCore
 from gumnut_simulator.exceptions import (
@@ -10,7 +10,6 @@ from gumnut_simulator.exceptions import (
     EmptyReturnStack,
     ReturnAddressStackOverflow,
 )
-
 
 
 class SimulatorState(IntEnum):
@@ -23,6 +22,7 @@ class GumnutSimulator:
     """
     Class which holds simulator data and CPU
     """
+
     def __init__(self):
         self.CPU = GumnutCore()
         self.lsom_map = dict()
@@ -58,7 +58,7 @@ class GumnutSimulator:
         """Initialize the CPU"""
         self.reset()
         try:
-            assembler = GumnutAssembler.GumnutAssembler()  # Create as a persistent member or only when needed here?
+            assembler = GumnutAssembler()  # Create as a persistent member or only when needed here?
             assembler.load_asm_source(source)
             assembler.assemble()
 
@@ -231,7 +231,7 @@ class GumnutSimulator:
     def get_breakpoints(self):
         """
         Return current breakpoints
-        """        
+        """
         return self.breakpoints
 
     def get_state(self):

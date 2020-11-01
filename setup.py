@@ -38,8 +38,8 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires=">=3.6",
-    entry_points={"console_scripts": ["gumnut-simulator = gumnut_simulator.GumnutSimulator:main"]},
-    install_requires=["gaspy"],
+    entry_points={"console_scripts": ["gumnut-simulator = gumnut_simulator.simulator:main"]},
+    install_requires=["gumnut-assembler"],
     extras_require={
         "dev": [
             "tox",
