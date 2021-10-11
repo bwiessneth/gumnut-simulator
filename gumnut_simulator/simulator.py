@@ -29,10 +29,6 @@ class GumnutSimulator:
         self.lines_of_code = 0
         self.current_line = 0
         self.number_of_instructions = 0
-        self.register_format = "#04x"
-        self.instr_memory_format = "05x"
-        self.data_memory_format = "02x"
-        self.memory_format = "d"
         self.breakpoints = list()
         self.exception = None
         self.state = SimulatorState.halt
@@ -128,14 +124,14 @@ class GumnutSimulator:
 
         for i in range(0, 8):
             register_name = "r" + str(i)
-            result.update({register_name: self._get_formatted_number(self.CPU.r[i], self.register_format)})
+            result.update({register_name: self.CPU.r[i]})
 
-        result.update({"PC": self._get_formatted_number(self.CPU.PC, "#04x")})
-        result.update({"SP": self._get_formatted_number(self.CPU.SP, "#04x")})
+        result.update({"PC": self.CPU.PC})
+        result.update({"SP": self.CPU.SP})
 
         ras = list()
         for i in range(0, 8):
-            ras.append(self._get_formatted_number(self.CPU.return_address_stack[i], "03x"))
+            ras.append(self.CPU.return_address_stack[i])
         result.update({"RAS": ras})
 
         return result
@@ -145,22 +141,14 @@ class GumnutSimulator:
         Return CPU instruction memory as a list
 
         :return: ``['F8', 'F4', 'B5', 'F7', 'C1', '97', ... , 'D8', 'D4', '86', '94', '9B']``"""
-        result = [
-            self._get_formatted_number(member, self.instr_memory_format)
-            for member in self.CPU.instruction_memory[offset : offset + size]
-        ]
-        return result
+        return self.CPU.instruction_memory
 
     def get_data_memory(self, offset=0, size=256):
         """
         Return CPU data memory as a list
 
         :return: ``['F8', 'F4', 'B5', 'F7', 'C1', '97', ... , 'D8', 'D4', '86', '94', '9B']``"""
-        result = [
-            self._get_formatted_number(member, self.data_memory_format)
-            for member in self.CPU.data_memory[offset : offset + size]
-        ]
-        return result
+        return self.CPU.data_memory
 
     def get_IO_controller_register(self):
         """
@@ -197,30 +185,6 @@ class GumnutSimulator:
             result.update({"exception": self.exception.as_dict()})
             self.exception = None
         return result
-
-    def set_number_format(self, identifier="", number_format="d"):
-        """Set number format"""
-        if identifier == "register":
-            if number_format == "d":
-                self.register_format = "d"
-            elif number_format == "h":
-                self.register_format = "#04x"
-            elif number_format == "o":
-                self.register_format = "#05o"
-            elif number_format == "b":
-                self.register_format = "#010b"
-        elif identifier == "memory":
-            if number_format == "d":
-                self.memory_format = "d"
-            elif number_format == "h":
-                self.memory_format = "02x"
-            elif number_format == "o":
-                self.memory_format = "03o"
-            elif number_format == "b":
-                self.memory_format = "08b"
-
-    def _get_formatted_number(self, number, number_format):
-        return format(number, number_format)
 
     def toggle_breakpoint(self, line_number):
         if line_number in self.breakpoints:
