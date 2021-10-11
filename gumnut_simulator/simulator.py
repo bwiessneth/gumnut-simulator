@@ -118,8 +118,8 @@ class GumnutSimulator:
         """
         Return CPU register as a dict
 
-        :return: ``{'r0': '0x00', 'r1': '0x00', ... , 'r7': '0x00',
-                    'PC': '0x00', 'SP': '0x00', 'RAS': ['F8', 'F4', 'B5', 'F7', 'C1' ]}``"""
+        :return: ``{'r0': 0x01, 'r1': 0x20, ... , 'r7': 0xFF,
+                    'PC': 0x34, 'SP': 0xA0, 'RAS': [0xF8, 0xF4, 0xB5', 0xF7, 0xC1 ]}``"""
         result = dict()
 
         for i in range(0, 8):
@@ -140,14 +140,14 @@ class GumnutSimulator:
         """
         Return CPU instruction memory as a list
 
-        :return: ``['F8', 'F4', 'B5', 'F7', 'C1', '97', ... , 'D8', 'D4', '86', '94', '9B']``"""
+        :return: ``[F8, F4, B5, F7, C1, 97, ... , D8, D4, 86, 94, 9B]``"""
         return self.CPU.instruction_memory
 
     def get_data_memory(self, offset=0, size=256):
         """
         Return CPU data memory as a list
 
-        :return: ``['F8', 'F4', 'B5', 'F7', 'C1', '97', ... , 'D8', 'D4', '86', '94', '9B']``"""
+        :return: ``[F8, F4, B5, F7, C1, 97, ... , D8, D4, 86, 94, 9B]``"""
         return self.CPU.data_memory
 
     def get_IO_controller_register(self):
