@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.1.1](https://www.github.com/bwiessneth/gumnut-simulator/compare/v1.1.0...v1.1.1) (2021-10-12)
+
+
+### Documentation
+
+* Fix configuration for latest sphinx-rtd-theme version, linting ([8428b77](https://www.github.com/bwiessneth/gumnut-simulator/commit/8428b7735d9174c01b5b413dee146ac23e35caad))
+
 ## 1.1.0 (2021-10-12)
 
 
