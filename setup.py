@@ -1,6 +1,7 @@
-import setuptools
 import codecs
 import os.path
+
+import setuptools
 
 
 # Taken from pip itself (https://github.com/pypa/pip/blob/master/setup.py#L11)
@@ -18,7 +19,7 @@ def get_version(rel_path):
     raise RuntimeError("Unable to find version string.")
 
 
-with open("README.rst", "r") as fh:
+with open("README.rst", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 
