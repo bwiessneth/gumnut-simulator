@@ -136,14 +136,14 @@ class GumnutSimulator:
 
         return result
 
-    def get_instruction_memory(self, offset=0, size=4096):
+    def get_instruction_memory(self):
         """
         Return CPU instruction memory as a list
 
         :return: ``[F8, F4, B5, F7, C1, 97, ... , D8, D4, 86, 94, 9B]``"""
         return self.CPU.instruction_memory
 
-    def get_data_memory(self, offset=0, size=256):
+    def get_data_memory(self):
         """
         Return CPU data memory as a list
 
