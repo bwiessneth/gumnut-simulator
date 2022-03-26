@@ -3,7 +3,7 @@ from collections import OrderedDict
 from enum import IntEnum
 
 from gumnut_assembler.assembler import GumnutAssembler
-from gumnut_assembler.exceptions import InvalidAssemblerInstruction
+from gumnut_assembler.exceptions import UnknownInstruction
 
 from gumnut_simulator import __version__
 from gumnut_simulator.core import GumnutCore
@@ -78,9 +78,10 @@ class GumnutSimulator:
 
             self.debug_symbols = assembler.source_objectcode_map
 
-        except (InvalidInstruction, InstructionMemorySizeExceeded) as e:
+        except (InvalidInstruction, InstructionMemorySizeExceeded, UnknownInstruction) as e:
             self.exception = e
             self.state = SimulatorState.halt
+            return False
         else:
             return True
 
