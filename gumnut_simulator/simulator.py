@@ -38,6 +38,7 @@ class GumnutSimulator:
         self.asm_source = ""
         self.debug_symbols = OrderedDict()
         self.previous_PC = -1
+        self.steps = 0
 
     def reset(self):
         """Reset the simulator and the CPU"""
@@ -52,6 +53,7 @@ class GumnutSimulator:
         self.asm_source = ""
         self.debug_symbols = OrderedDict()
         self.previous_PC = -1
+        self.steps = 0
 
     def setup(self, source):
         """Initialize the CPU"""
@@ -87,6 +89,7 @@ class GumnutSimulator:
         try:
             self.previous_PC = self.CPU.PC
             self.CPU.step()
+            self.steps += 1
             if self.get_current_line() in self.breakpoints:
                 self.state = SimulatorState.breakpoint
             else:
@@ -180,6 +183,7 @@ class GumnutSimulator:
         result.update({"current_line": self.get_current_line()})
         result.update({"breakpoints": self.get_breakpoints()})
         result.update({"data_memory_access_addr": self.CPU.data_memory_access_addr})
+        result.update({"steps": self.steps})
         if self.CPU.instruction is not None and self.CPU.instruction.instruction == "jsb":
             current_ret_line = self._get_source_line_from_address(self.previous_PC + 1)
             result.update({"current_ret_line": current_ret_line})
