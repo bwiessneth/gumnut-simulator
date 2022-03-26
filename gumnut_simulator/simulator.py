@@ -1,13 +1,16 @@
-from enum import IntEnum
-from collections import OrderedDict
 import json
+from collections import OrderedDict
+from enum import IntEnum
+
 from gumnut_assembler.assembler import GumnutAssembler
+from gumnut_assembler.exceptions import InvalidAssemblerInstruction
+
 from gumnut_simulator import __version__
 from gumnut_simulator.core import GumnutCore
 from gumnut_simulator.exceptions import (
-    InvalidInstruction,
-    InstructionMemorySizeExceeded,
     EmptyReturnStack,
+    InstructionMemorySizeExceeded,
+    InvalidInstruction,
     ReturnAddressStackOverflow,
 )
 
